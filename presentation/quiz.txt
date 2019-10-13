@@ -1,0 +1,4 @@
+# Vad är ungefärligt max antal kodpunkter som unicode kan represenera?
+Tiotusen, Hundratusen, En miljon, En miljard
+
+#
