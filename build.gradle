@@ -9,6 +9,7 @@ repositories {
 }
 
 dependencies {
+    compile group: 'com.ibm.icu', name: 'icu4j', version: '65.1'
     testImplementation('org.junit.jupiter:junit-jupiter:5.5.2')
 }
 

@@ -1,9 +1,10 @@
 import org.junit.jupiter.api.Test;
 
+import java.util.function.Consumer;
+
 public class JavaLangCharacter {
 
-    @Test
-    void encode() {
+    void decode(String s, Consumer<Integer> onCodePoint) {
         var string = "...";
         for (int i = 0; i < string.length(); i++) {
             char c1 = string.charAt(i);
@@ -19,7 +20,9 @@ public class JavaLangCharacter {
             } else {
                 codePoint = c1;
             }
-            // Do something with code point.
+
+            // Do something with code point:
+            onCodePoint.accept(codePoint);
         }
     }
 

@@ -6,22 +6,20 @@ import java.nio.charset.StandardCharsets;
 
 public class Endian {
 
-    // BOM=U+FEFF, A=U+0041
     @Test
     void specifiedOrderWithBom() throws IOException {
         var out = new ByteArrayOutputStream();
         out.writeBytes(new byte[]{(byte) 0xFE, (byte) 0xFF, 0x00, 0x41});
-
-        var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()), StandardCharsets.UTF_16BE);
+        var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
+                StandardCharsets.UTF_16BE);
         char c = (char) in.read();
         Assertions.assertEquals(0xFEFF, c);
         c = (char) in.read();
         Assertions.assertEquals('A', c);
-
         out = new ByteArrayOutputStream();
         out.writeBytes(new byte[]{(byte) 0xFF, (byte) 0xFE, 0x41, 0x00});
-
-        in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()), StandardCharsets.UTF_16LE);
+        in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
+                StandardCharsets.UTF_16LE);
         c = (char) in.read();
         Assertions.assertEquals(0xFEFF, c);
         c = (char) in.read();

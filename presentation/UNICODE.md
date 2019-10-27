@@ -45,16 +45,9 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 
 
 ---
-# Mer om ASCII??
-
-TODO: Något om ctrl, bits, 4 column?
-
-
-
----
 # 7 bitar räcker inte långt
 
-- När åttonde biten blev tillgänglig fick det plats för mer. Många varianter som använda åttonde bit:en skapades
+- När åttonde biten blev tillgänglig fick det plats för mer. Många varianter som använde åttonde bit:en skapades
 
 - *ISO 8859-1* (eller *latin1*) den vanligaste i västvärlden
   - ÅÄÖ (och ØÑØÙß..) har värden definierade
@@ -70,7 +63,7 @@ TODO: Något om ctrl, bits, 4 column?
 ---
 # En universell teckenkodning?
 
-- Det vore trevligt att ha kunna uttrycka all världens tecken med en standard.
+- Det vore önskvärt att kunna uttrycka all världens tecken med en standard
 
 - Unicode, en idé om detta, arbetades fram i slutet på 80-talet
 
@@ -80,7 +73,11 @@ TODO: Något om ctrl, bits, 4 column?
 ---
 # Unicode, ursprunglig draft
 
-"Unicode is intended to address the need for a workable, reliable world text encoding. Unicode could be roughly described as "wide-body ASCII" that has been stretched to 16 bits to encompass the characters of all the world's living languages. In a properly engineered design, 16 bits per character are more than sufficient for this purpose."
+"Unicode is intended to address the need for a workable, reliable world text encoding.
+
+Unicode could be roughly described as "wide-body ASCII" that has been stretched to 16 bits to encompass the characters of all the world's **living languages**.
+
+In a properly engineered design, 16 bits per character are more than sufficient for this purpose."
 
 
 ---
@@ -98,16 +95,16 @@ TODO: Något om ctrl, bits, 4 column?
 
 - "Bokstäver" får en identitet, som A:=0x0041
 
-- Detta är en högre nivå än teckenkodning. A är A oavsett om ASCII eller UTF-16 används som teckenenkodning
+- Detta är på en mer abstrakt nivå än teckenkodning. A är A oavsett om ASCII eller UTF-16 används som teckenenkodning
   
 ---
 # Kodpunkter
 - Vi kallar denna identet för *kodpunkt* (en: *code point*)
-  - Mer generellt än bokstav.
+  - Mer generellt än bokstav
 
-- Använd U+0041 som syntax istället för 0x0041.
+- Använd U+0041 som syntax istället för 0x0041
 
-- Unicode definierar både egenskaper för kodpunkter, och teckenenkodningar för att representera dessa.
+- Unicode definierar både egenskaper för kodpunkter, och teckenenkodningar för att representera dessa
 
 
 ---
@@ -124,37 +121,68 @@ TODO: Något om ctrl, bits, 4 column?
 # Endian problemet: Little-Endian
 - Little-Endian: Omvänt - på små (*Small*) addresser kommer slutet (*End*) på talet
 
-  - På stora (*Big*) addresser kommer slutet (*End*) på talet.
+  - På små (*Little*) addresser kommer slutet (*End*) på talet.
   
-  - Används av intelprocessorer.
+  - Används av intelprocessorer
   
-  - ∞=0x221E blir representerat som bytet-sekvensen `{0x1E, 0x22}`.
+  - ∞=0x221E blir representerat som bytet-sekvensen `{0x1E, 0x22}`
 
 ---
 # UTF-16BE och UTF16LE
 
-- U+FEFF är en byte order mark.
+- U+.blue[FE].red[FF] är en byte order mark.
 
-  - Placera den i början på fil. Vid inläsning, om de två första byte är `{0xFE, 0xFF}` är det BE, annars LE.
+  - Placera den i början på fil. Vid inläsning, om de två första byte är {0x.blue[FE], 0x.red[FF]} är det BE, annars {0x.red[FF], 0x.blue[FE]} och därigenom LE
 
-  - Det omkastade värdet U+FEFF är definierat att aldrig användas av text, så det inte dyker upp av misstag.
+  - Det omkastade värdet U+.red[FF].blue[FE] är definierat att aldrig användas av text, så det inte dyker upp av misstag
   
 ---
 # Default endianess i UTF-16
 
 - Om ingen BOM finns i början på input?
 
-  - Enligt Unicode-standard är UTF-16 "default".
+  - Enligt Unicode-standard är UTF-16BE "default"
   
-  - I java är UTF-16=UTF-16BE om ingen BE detekteras.
+  - I java är UTF-16=UTF-16BE om ingen BE detekteras
   
-  - Men UTF-16LE är vanligare i praktiken och t.ex. WHATWG säger att tolka UTF-16 som UTF-16LE.
+  - Men UTF-16LE är vanligare i praktiken och t.ex. WHATWG säger att tolka UTF-16 som UTF-16LE
+  
+---
+# Character encoding i java
+- En character encoding representeras av klassen [java.nio.charset.Charset](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/charset/Charset.html)
+
+- För vanliga charsets finns Charset-instanser som fält i [StandardCharsets](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/charset/StandardCharsets.html)
+  - StandardCharsets.ISO_8859_1
+  - StandardCharsets.UTF_8
+  - StandardCharsets.UTF_16
+  - StandardCharsets.UTF_16BE
+  - StandardCharsets.UTF16_LE
+
+---
+# Icke-standard encoding i java
+För icke-standard encodings kan `Charset.forName(String charsetName)` användas:
+
+```java
+try {
+    Charset myCharset = Charset.forName("utf-16");
+    doSomethingWithCharset(myCharset);
+} catch (UnsupportedCharsetException e) {
+    // Hantera UnsupportedCharsetException, ett checked exception.
+}
+```
+
+```java
+// För standard charsets (som UTF-8 ovan) är det dock onödigt med ovanstående
+// konstruktion (från och med java 7), eftersom dessa charset alltid stöds:
+doSomethingWithCharset(StandardCharsets.UTF_16);
+```
   
 ---
 # Läsa UTF_16BE och UTF-16LE i java
 
 ```java
 // BOM=U+FEFF, A=U+0041
+// OBS: Dåligt som exempel, BOM ska inte användas när byte order anges explicit
 @Test
 void specifiedOrderWithBom() throws IOException {
     var out = new ByteArrayOutputStream();
@@ -181,7 +209,7 @@ void specifiedOrderWithBom() throws IOException {
 
 ???
 - Understryk ordningen av byte array.
-- Byte Order Mark erhålls som första bokstav.
+- Byte Order Mark erhålls som första bokstav pga av byte order angetts explicit i BE och LE
 
 
 ---
@@ -254,7 +282,7 @@ void defaultUtf16() throws IOException {
 
 ---
 # Surrogatkodpunkter
-  - Om första värdet är en *high surrogate*, i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värder)..
+  - Om första värdet är en *high surrogate*, i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värder)...
   
   - så kombineras den med en följande *low surrogate*, i intervallet U+DC00 till U+DFFF (återigen 1,024 möjliga värden)
   
@@ -266,7 +294,16 @@ void defaultUtf16() throws IOException {
 
 - Unicode kommer inte definiera utanför den mängden
   
-- 836,536 lediga tecken i senaste Unicode 12.1
+- 836,536 lediga tecken (**Reserverade**, dvs tillgängliga för användning men ännu inte definierade) i senaste Unicode 12.1
+
+---
+# Unicodes namnrymd
+- Totalt möjliga värden:
+  - 2^16 - 2\*1024 + 1024\*1024 = 1,112,064
+
+- Unicode kommer inte definiera utanför den mängden
+  
+- 836,536 lediga tecken (**Reserverade**, dvs tillgängliga för användning men ännu inte definierade) i senaste Unicode 12.1
 
 
 ---
@@ -284,10 +321,18 @@ W2 = 110111xxxxxxxxxx      // 0xDC00 + xxxxxxxxxx
 
 - Java har en primitiv *char*, 16 bitar
 
-- `String.length()` returnerar antal UTF-16 värden, inte antal kodpunkter.
+- `String.length()` returnerar antal UTF-16 värden, inte antal kodpunkter
 
 - Kodpunkter som kräver två 16 bitars är ofta ovanliga
-  - Finns många fel 
+  - Många system hanterar inte detta korrekt
+  
+---
+# Java-sträng från bytes och till bytes
+- `new String(byte[] bytes, Charset charset)`
+
+- `byte[] String.getBytes(Charset charset)`
+  
+- Vid större datamängder bör strömmar användas för att kontinuerligt tolka/koda allteftersom data blir tillgänligt
 
 ---
 # Hantering av surrogatkodpunkter i java
@@ -300,7 +345,7 @@ for (int i = 0; i < string.length(); i++) {
     char c1 = string.charAt(i);
 
     int codePoint;
-    if (Character.isHighSurrogate(c1)) { // 110110yyyyyyyyyy
+    if (Character.isHighSurrogate(c1)) {
         i++;
         char c2 = string.charAt(i + 1);
         if (Character.isLowSurrogate(c2)) {
@@ -373,9 +418,9 @@ public static void main(String[] args) {
 ---
 # UTF-8
 
-- UTF-16 är 16-bitars värden som vid behov kan kombineras för att ge en kodpunkt med högt värde.
+- UTF-16 är 16-bitars värden som vid behov kan kombineras **med ett annat värde** för att ge en kodpunkt med högt värde
 
-- UTF-8 är 8-bitars värden som vid behov kan kombineras för att ge en kodpunkt med högt värde.
+- UTF-8 är 8-bitars värden som vid behov kan kombineras **med upp till tre andra värden** för att ge en kodpunkt med högt värde
 
 
 ---
@@ -383,7 +428,7 @@ public static void main(String[] args) {
 
 - Bakåtkompatibilitet med ASCII, i det att ASCII är ett subset av UTF-8, så alla ASCII filer är UTF-8 filer.
 
-- Minnesåtgång vid representation - om största delen av texten är ASCII (vilket i många sammanhang är fallet), dubblerar UTF-16 minnesanvändning (= ger sämre prestanda)
+- Utrymme i minne och lagring - om största delen av texten är ASCII (vilket i många sammanhang är fallet), dubblerar UTF-16 minnesanvändning (= ger sämre prestanda)
 
 
 ---
@@ -470,11 +515,20 @@ public static void main(String[] args) {
 ---
 # Felhantering: Byt ut fel mot ersättningsbokstav
 - Byt ut fel mot ersättningsbokstav
-  - Ofta ?=U+003F (QUESTION MARK*) eller �=U+FFFD (REPLACEMENT CHARACTER)
 
----
-# Felhantering: TODO: See wikipedia
+- Ofta ?=U+003F (QUESTION MARK*) eller �=U+FFFD (REPLACEMENT CHARACTER)
+  
+```java
+@Test
+void för_i_iso_8859_1_inläst_som_utf8() {
+    byte[] för_i_iso_8859_1 = new byte[]{'f', (byte) 0xF6, 'r' };
+    String s = new String(för_i_iso_8859_1, StandardCharsets.UTF_8);
+    Assertions.assertEquals("f\uFFFDr", s);
+}
+```
 
+???
+- Vi har gått igenom encodings nu - paus innan vi tar oss an Unicode och egenskaper
 
 ---
 # Unicode som databas
@@ -483,4 +537,105 @@ public static void main(String[] args) {
 - Namn är en egenskap:
   - U+0041 (A) har namnet "LATIN CAPITAL LETTER A"
   - U+1F4A9 (💩) har namnet "PILE OF POO"
+  
+---
+# Namn av code point i java
+- Javas standardbibliotek innehåller delar av Unicodes databas
 
+- `Character.getName(int codePoint)` kan t.ex. användas för att erhålla namnet för en kodpunkt:
+
+```java
+@Test
+void codePointName() {
+    var codePoint = 0x0041; // A
+    assertEquals("LATIN CAPITAL LETTER A", Character.getName(codePoint));
+    codePoint = 0x1F4A9; // 💩
+    assertEquals("PILE OF POO", Character.getName(codePoint));
+}
+```
+
+---
+# Java versioner och Unicode versioner
+```
+Java version   Release date         Unicode version
+------------   ------------         ---------------
+Java 13        September 2019       Unicode 12.1
+Java 12        March 2019           Unicode 11.0
+Java 11        March 2018           Unicode 10.0
+Java 10        September 2018       Unicode 8.0
+Java 9         September 2017       Unicode 8.0
+Java 8         March 2014           Unicode 6.2
+Java SE 7      July 28, 2011        Unicode 6.0
+Java SE 6      December 11, 2006    Unicode 4.0
+J2SE 5.0       September 30, 2004   Unicode 4.0
+J2SE 1.4       February 6, 2002     Unicode 3.0
+J2SE 1.3       May 8, 2000          Unicode 2.1
+J2SE 1.2       December 8, 1998     Unicode 2.1
+JDK 1.1        February 19, 1997    Unicode 2.0
+JDK 1.1.7      September 12, 1997   Unicode 2.1
+JDK 1.1        February 19, 1997    Unicode 2.0
+JDK 1.0        January 23, 1996     Unicode 1.1.5
+```
+
+---
+# General category
+Varje kodpunkt har en [General Category](https://en.wikipedia.org/wiki/Unicode_character_property#General_Category)
+
+Kan erhållas med hjälp av `Character.getType(int codePoint)`:
+
+```java
+@Test
+void generalCategory() {
+    assertEquals(Character.CONNECTOR_PUNCTUATION, Character.getType('_'));
+    assertEquals(Character.MATH_SYMBOL, Character.getType('='));
+    assertEquals(Character.SURROGATE, Character.getType(0xD800));
+}
+```
+
+---
+# Plan i unicode
+
+- Gå igenom hur många, namn
+- Visa bild på BMP: https://en.wikipedia.org/wiki/UTF-16#/media/File:Unifont_Full_Map.png
+
+
+---
+# Combining characters
+- En combining character modifierar andra bokstäver, som när `U+0306 (COMBINING BREVE)` nedan modifierar `U+0079 (LATIN SMALL LETTER Y)`.
+
+![y och breve](combining.svg)
+
+---
+# Combining characters: Emoji modifier
+Ett annat exempel på modifiers är de som anger hudfärg på emojis, som `U+1F3FE (EMOJI MODIFIER FITZPATRICK TYPE-5)` nedan:
+
+![emoji och skin tone](skin-modifier.png)
+
+---
+# Combining characters: Multiple
+
+Flera modifiers kan förekomma, nedan med `U+0065 (LATIN SMALL LETTER E)` och `U+0304 (COMBINING MACRON)` som exempel:
+
+## ē // U+0065, U+0304
+
+## ē̄ // U+0065, U+0304, U+0304
+
+## ē̄̄ // U+0065, U+0304, U+0304, U+0304
+
+---
+# Bokstäver som kan uttryckes både med och utan modifier
+
+---
+# Bokstäver kan vara olika breda
+Från (BRAAA POST)
+https://manishearth.github.io/blog/2017/01/14/stop-ascribing-meaning-to-unicode-code-points/
+
+`U+FDFD (ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM)` är en kodpunkt som ser ut så här:
+﷽
+..
+
+---
+# TODO: Collation? Upper/Lower case?
+Inspiration from:
+https://manishearth.github.io/blog/2017/01/15/breaking-our-latin-1-assumptions/
+TODO: Mention uniview? https://r12a.github.io/uniview/?charlist=%F0%9F%91%A9%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6
