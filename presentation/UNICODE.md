@@ -1,6 +1,13 @@
 class: center, middle
 # Något om Unicode
 
+---
+# Mål
+
+- Veta vad UTF-8, UTF-16 och UTF-32 är
+- Få en insikt i historiken för att förstå nuvarande system
+- Veta vad Unicode normalization är
+- Veta hur kodpunkter kan användas i java
 
 ---
 # Det började med bilder...
@@ -282,9 +289,9 @@ void defaultUtf16() throws IOException {
 
 ---
 # Surrogatkodpunkter
-  - Om första värdet är en *high surrogate*, i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värder)...
+- Om första värdet är en *high surrogate*, i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värder)...
   
-  - så kombineras den med en följande *low surrogate*, i intervallet U+DC00 till U+DFFF (återigen 1,024 möjliga värden)
+- så kombineras den med en följande *low surrogate*, i intervallet U+DC00 till U+DFFF (återigen 1,024 möjliga värden)
   
 
 ---
@@ -532,7 +539,7 @@ void för_i_iso_8859_1_inläst_som_utf8() {
 
 ---
 # Unicode som databas
-- Unicode kan ses som en databas som definierar egenskaper för kodpunkter
+- Unicode kan ses som en versionerad databas som definierar egenskaper för kodpunkter
 
 - Namn är en egenskap:
   - U+0041 (A) har namnet "LATIN CAPITAL LETTER A"
@@ -624,6 +631,104 @@ Flera modifiers kan förekomma, nedan med `U+0065 (LATIN SMALL LETTER E)` och `U
 
 ---
 # Bokstäver som kan uttryckes både med och utan modifier
+(Ekvivalens pga combining and precomposed characters)
+Bokstaven **Å** kan uttryckas som
+
+- Kodpunkten `U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)`
+- Kodpunkten `U+0041 (LATIN CAPITAL LETTER A)` följt av `U+030A (COMBINING RING ABOVE)`:
+  - A +         	̊ = Å
+
+---
+# Ekvivalens pga character duplication
+Förutom att skrivas med modifying character, så kan **Å** skrivas:
+
+- Kodpunkten `U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)`
+
+- Kodpunkten `U+212B (ANGSTROM SIGN)`
+
+Dessa är att anse som ekvivalenta.
+
+---
+# Unicode canonical equivalence
+Det finns alltså (åtminstone) tre sätt att uttrycka Å. Oavsett kodpunkter är dessa definierade som *kanoniskt ekvivalenta*, vilket innebär:
+
+- Ser samma ut när de skrivs ut och visas grafiskt
+- Kan bytas ut mot varandra utan att ändra innebörd för användaren
+- Ska därför t.ex. sorteras likadant och sökas efter likadant
+
+---
+# Unicode compatible equivalence
+Förutom den starka kanoniska ekvivalensen finns det en svagare *kompatibel ekvivalens*:
+
+- Kan ha olika utseenden, men har samma mening i vissa (men inte alla) kontexter
+- Kan bytas ut mot varandra i vissa kontexter, inte alltid
+- Exempel: ﬀ (`U+FB00, LATIN SMALL LIGATURE FF`) är kompatibel med ff (två "f"-tecken i följd, U+0066 U+0066)
+
+---
+# Unicode normalization
+- Unicode definierar hur en text kan normaliseras, vilket innebär att två texter som är ekvivalenta normaliseras till samma text.
+  - `normalize(s1) == normalize(s2)` omm s1 och s2 är ekvivalenten
+
+---
+# Unicode normalization
+- Detta görs antingen genom att sätta samman kodpunkter så långt det går (**fully composed**)
+- ... eller genom att splittra upp kodpunkter så långt det går (**fully decomposed**)
+
+- Det kan göras via kanonisk ekvivalens
+- ... eller kompatibel ekvivalens
+
+Dvs, fyra möjligheter.
+
+---
+# Normal form: NFD
+**NFD**: Normalization Form Canonical Decomposition
+
+Characters are **decomposed** by canonical equivalence, and multiple combining characters are arranged in a **specific order**.
+
+---
+# NFD: Specifik ordning viktig
+Här är specifik ordning viktig, så att
+
+- "a modifierad med prick ovanför modifierad med prick nedanför"
+
+normaliseras till samma form som
+
+- "a modifierad med prick nedanför modifierad med prick ovanför"
+
+---
+# Normal form: NFC
+**NFC**: Normalization Form Canonical Composition
+
+Characters are decomposed and then recomposed by canonical equivalence.
+
+---
+# Varianter med kompatibel ekvivalens
+- NF.green[K].red[D] (Normalization Form .green[Compatibility] .red[Decomposition])
+- NF.green[K].blue[C] (Normalization Form .green[Compatibility] .blue[Composition])
+- NF.red[D] (Normalization Form Canonical .red[Decomposition])
+- NF.blue[C] (Normalization Form Canonical .blue[Composition])
+
+---
+# Hur kan Unicode normalisering användas
+- Önskvärd funktionalitet: Ekvivalenta söktermer ska ge ekvivalenta sökresultat
+
+- Säkerhetsaspekt: En användare som heter "Åsa" missköter sig och stängs av - men var det rätt användare?
+
+- Normalisera alltid användar input innan någon operation utförs (data sparas eller söks efter)
+
+---
+# HFS, APFS och Unicode normalisering
+"iOS HFS Normalized UNICODE names, APFS now treats all files as a bag of bytes on iOS. We are requesting that Applications developers call the correct Normalization routines to make sure the file name contains the correct representation."
+
+- Ibland en bra approach: Data är "bag of bytes" utan komplicerad tolkning i många lager
+
+???
+- HFS var gamla filsystemet på Mac och iOS, som hade normalisering inbyggt
+- Det är undantag bland filsystem att agera så, och nya filsystemet som ersatte detta gör inte inbyggd Unicode normalisation
+
+---
+# Java kodexempel med Unicode normalization
+TODO
 
 ---
 # Bokstäver kan vara olika breda

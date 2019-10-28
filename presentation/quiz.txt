@@ -1,4 +1,61 @@
-# Vad är ungefärligt max antal kodpunkter som unicode kan represenera?
-Tiotusen, Hundratusen, En miljon, En miljard
+# Vad är ungefärligt max antal kodpunkter som Unicode kan represenera?
+- Tiotusen
+- Hundratusen
+- En miljon
+- En miljard
+
+# Vad är sant?
+- En kodpunkt renderas alltid samma vidd
+- En kodpunkts definition kommer aldrig ändras eller tas bort
+- En kodpunkt är alltid vad en användare upplever som en bokstav
+- En kodpunkt kan alltid representeras av 16 bitar
+
+# Vilken är den vanligaste teckenuppsättningen på webben?
+- UTF-8
+- UTF-16
+- UTF-24
+- UTF-32
+
+# Hur många bitar rymmer en java char?
+- 8
+- 16
+- 32
+- 64
+
+# Hur många bytes kan en kodpunkt serialiseras till i utf-8 som längst?
+- 1
+- 2
+- 3
+- 4
+
+# Hur många bytes kan en kodpunkt serialiseras till i utf-8 som minst?
+- 1
+- 2
+- 3
+- 4
+
+# Hur många bytes kan en kodpunkt serialiseras till i utf-16 som minst?
+- 1
+- 2
+- 3
+- 4
+
+# Hur många bytes kan en kodpunkt serialiseras till i utf-16 som längst?
+- 1
+- 2
+- 3
+- 4
+
+# Hur många plan finns det i Unicode?
+- 7
+- 17
+- 27
+- 77
+
+# Vilken normaliserad form kommer aldrig vara kortare än någon annan?
+- NFD, Canonical Decomposition
+- NFC, Canonical Composition
+- NFKD, Compatibility Decomposition
+- NFKC, Compatibility Composition
 
 #
