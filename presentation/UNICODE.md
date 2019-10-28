@@ -630,6 +630,22 @@ Flera modifiers kan förekomma, nedan med `U+0065 (LATIN SMALL LETTER E)` och `U
 ## ē̄̄ // U+0065, U+0304, U+0304, U+0304
 
 ---
+# Olika typer av kombinerande kodpunkter
+
+Med hjälp av `Character.getType(codePoint)` kan vi se erhålla Unicode kategoring och se vilken typ av kombinerande kodpunkt det rör sig om.
+
+---
+# Olika typer av kombinerande kodpunkter
+
+- Character.**NON_SPACING_MARK**: Märken såsom cirkel&prickar i ÅÄÖ som går ovanför eller under utan att påverka vidden.
+
+- Character.**ENCLOSING_MARK**: Ett omgivande märke som en cirkel.
+
+- Character.**COMBINING_SPACING_MARK**: En markering som påverkar vidden på det den kombineras med.
+
+
+
+---
 # Bokstäver som kan uttryckes både med och utan modifier
 (Ekvivalens pga combining and precomposed characters)
 Bokstaven **Å** kan uttryckas som
@@ -740,7 +756,38 @@ https://manishearth.github.io/blog/2017/01/14/stop-ascribing-meaning-to-unicode-
 ..
 
 ---
-# TODO: Collation? Upper/Lower case?
+# Gemener och versaler: Skillnader i antal kodpunkter
+Javas `String.toUpperCase()` hanterar komplexiteten i gemener&versaler.
+
+En sak att vara medveten om är att längden skiljer sig.
+
+- ß U+00DF LATIN SMALL LETTER SHARP S
+
+S U+0053 LATIN CAPITAL LETTER S
+S U+0053 LATIN CAPITAL LETTER S
+
+
+```java
+void upper() {
+    // ß U+00DF LATIN SMALL LETTER SHARP S
+    // till versaler blir
+    // S U+0053 LATIN CAPITAL LETTER S
+    // S U+0053 LATIN CAPITAL LETTER S
+    Assertions.assertEquals("ß".toUpperCase(), "SS");
+}
+```
+
+---
+# Gemener och versaler: Skillnad mellan språk
+TODO: "i".toUpperCase(Locale.forLanguageTag("tr")) blir annorlunda på turkiska, 
+
+- `I U+0049 LATIN CAPITAL LETTER I`
+- `İ U+0130 LATIN CAPITAL LETTER I WITH DOT ABOVE` på turkiska
+  - Eller `U+0049 LATIN CAPITAL LETTER I` följt av `U+0307 COMBINING DOT ABOVE` för decomposed.
+
+
+---
+# TODO: Collation?
 Inspiration from:
 https://manishearth.github.io/blog/2017/01/15/breaking-our-latin-1-assumptions/
 TODO: Mention uniview? https://r12a.github.io/uniview/?charlist=%F0%9F%91%A9%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6
