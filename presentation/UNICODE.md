@@ -54,18 +54,44 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 ---
 # 7 bitar räcker inte långt
 
-- När åttonde biten blev tillgänglig fick det plats för mer. Många varianter som använde åttonde bit:en skapades
+- När åttonde biten blev tillgänglig fick det plats för mer
+- **Många** varianter som använde åttonde biten skapades
 
-- *ISO 8859-1* (eller *latin1*) den vanligaste i västvärlden
-  - ÅÄÖ (och ØÑØÙß..) har värden definierade
-  - Stödjer "västeuropeiska" språk (men inte alla, och inte fullt ut)
+???
+- Vi ska bara nämna de två viktigaste
+
+---
+# 8 bitars teckenkodning: ISO-8859-1
+
+- **ISO 8859-1** (eller **latin1**) den vanligaste i västvärlden
+
+- ÅÄÖ (och ØÑØÙß..) har värden definierade
+  
+- Stödjer "västeuropeiska" språk (men inte alla, och inte fullt ut)
+
+---
+# 8 bitars teckenkodning: Windows-1252
+
+- Användes som default i gamla Windows-komponenter
+
+- ISO-8859 lägger till ett 30-tal kontrolltecken (dvs "konstiga", icke-synliga tecken) till ASCII
+  
+- Windows-1252 har synliga bokstäver istället. Mer praktiskt för de flesta som hellre ville ha bokstäver än kontrolltecken
+
+???
+- Det är vanligt att Windows-1252 är felaktigt deklarerade som ISO-8859-1
+- Så vanligt att HTML5-specifikationen säger att dokument som utger sig för ISO-8859-1 ska behandlas som windows-1252
+  - Eftersom det är vanligare att bokstäverna används istället för kontrolltecken
   
 ---
 # 8 bitar räcker inte heller så långt...
 
 - Räcker fortfarande inte långt internationellt
 
-  - Och behov av tecken tillkommer även i västeuropa - exempelvis €
+- Behov av tecken tillkommer även i västeuropa
+  - €
+  - 🤓
+  
 
 ---
 # En universell teckenkodning?
@@ -88,30 +114,40 @@ In a properly engineered design, 16 bits per character are more than sufficient 
 
 
 ---
-# UTF-16
-
-- A=0x0041, B=0x0042, ..., Ö=0x00D6, ..., ∞=0x221E
-  - Värdet för A=0x41 är kompatibelt med ASCII, men inte byte-representationen (två bytes)
-  
-- Värdena kräver två bytes - vilken ordning? *Big-Endian* vs *Little-Endian*
-
-
----
 # Identitet för bokstäver oavsett teckenkodning
-- Låt oss införa en notation för värden av tecken
+- "Bokstäver" får en **identitet oavsett byte-representation**
 
-- "Bokstäver" får en identitet, som A:=0x0041
+- Denna identitet identifieras av ett numeriskt värde, som A:=0x0041, B:=0x0042, ...
 
-- Detta är på en mer abstrakt nivå än teckenkodning. A är A oavsett om ASCII eller UTF-16 används som teckenenkodning
+- En mer abstrakt nivå än teckenkodning
+
+???
+- Påpeka vikten av att dela upp förståelsen av teckenkodning som en sak
+- "Bokstäver" som annat
+- Hjälper att dela upp ett stort komplext problem i två (iofs fortfarande stora, men iaf mindre...)
+
   
 ---
 # Kodpunkter
-- Vi kallar denna identet för *kodpunkt* (en: *code point*)
+- Vi kallar denna identet för **kodpunkt** (en: **code point**)
   - Mer generellt än bokstav
 
-- Använd U+0041 som syntax istället för 0x0041
+- .blue[U+0041] används som syntax istället för .red[0x0041]
 
 - Unicode definierar både egenskaper för kodpunkter, och teckenenkodningar för att representera dessa
+
+???
+- Vi vill slippa säga "bokstäver" i citat
+- Syntaxen med U+ gör att det blir klart när vi pratar om det mer abstrakta begreppet kodpunkt, istället för byte-representationer
+
+
+---
+# UTF-16
+
+- **Två bytes** per kodpunkt: A=0x0041, B=0x0042, ..., Ö=0x00D6, ..., ∞=0x221E
+  - Värdet för A=0x41 är kompatibelt med ASCII, men inte byte-representationen (två bytes)
+  
+- Värdena kräver två bytes - vilken ordning? *Big-Endian* vs *Little-Endian*
 
 
 ---
@@ -136,23 +172,48 @@ In a properly engineered design, 16 bits per character are more than sufficient 
 
 ---
 # UTF-16BE och UTF16LE
+- **UTF-16BE** och **UTF-16LE** är namnet för teckenkodningar med big-endian och little-endian byte order
 
-- U+.blue[FE].red[FF] är en byte order mark.
+- .blue[Content-Type: text/html; charset=utf-16be]
+
+- .red[Content-Type: text/html; charset=utf-16]
+  - 🤔 Hur ska det här tolkas - big eller little endian?
+
+???
+- charset är case insentive här i http-headern (ofta lower case)
+- Så här ska bara "utf-16" avläsas? (någon som har idé)?
+- Någon som sätt en "feff" (F E FF) i början av t.ex. en xml-fil i en texteditor?
+
+---
+# Byte order mark
+
+- Kodpunkten U+.blue[FE].red[FF] är en byte order mark
 
   - Placera den i början på fil. Vid inläsning, om de två första byte är {0x.blue[FE], 0x.red[FF]} är det BE, annars {0x.red[FF], 0x.blue[FE]} och därigenom LE
 
   - Det omkastade värdet U+.red[FF].blue[FE] är definierat att aldrig användas av text, så det inte dyker upp av misstag
+
+---
+# Byte order mark vs UTF-16BE och UTF-16LE
+
+- .blue[Content-Type: text/html; charset=utf-16be]
+- .red[Content-Type: text/html; charset=utf-16le]
+
+- Om byte order är angiven explicit som ovan ska byte order mark **inte användas**
+
+???
+- Ska visa exempel på varför strax 
   
 ---
 # Default endianess i UTF-16
 
 - Om ingen BOM finns i början på input?
 
-  - Enligt Unicode-standard är UTF-16BE "default"
+  - Enligt Unicode-standard är UTF-16.blue[BE] "default"
   
-  - I java är UTF-16=UTF-16BE om ingen BE detekteras
+  - Och i java är UTF-16=UTF-16.blue[BE] om ingen BE detekteras
   
-  - Men UTF-16LE är vanligare i praktiken och t.ex. WHATWG säger att tolka UTF-16 som UTF-16LE
+  - Men UTF-16.red[LE] är vanligare i praktiken och t.ex. WHATWG säger att tolka UTF-16 som UTF-16.red[LE]
   
 ---
 # Character encoding i java
@@ -165,6 +226,8 @@ In a properly engineered design, 16 bits per character are more than sufficient 
   - StandardCharsets.UTF_16BE
   - StandardCharsets.UTF16_LE
 
+???
+- Låt oss gå in på java
 ---
 # Icke-standard encoding i java
 För icke-standard encodings kan `Charset.forName(String charsetName)` användas:
@@ -183,6 +246,35 @@ try {
 // konstruktion (från och med java 7), eftersom dessa charset alltid stöds:
 doSomethingWithCharset(StandardCharsets.UTF_16);
 ```
+
+---
+# Detektera byte order med java
+```java
+// BOM=U+FEFF, A=U+0041
+@Test
+void detectByteOrder() throws IOException {
+    var out = new ByteArrayOutputStream();
+    out.writeBytes(new byte[]{(byte) 0xFE, (byte) 0xFF, 0x00, 0x41});
+
+    var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
+                                   StandardCharsets.UTF_16);
+    char c = (char) in.read();
+    assertEquals('A', c);
+
+    out = new ByteArrayOutputStream();
+    out.writeBytes(new byte[]{(byte) 0xFF, (byte) 0xFE, 0x41, 0x00});
+
+    in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
+                               StandardCharsets.UTF_16);
+    c = (char) in.read();
+    assertEquals('A', c);
+}
+```
+
+???
+- Notera att BOM inte läses till applikationen - 'A' är den första bokstaven
+
+
   
 ---
 # Läsa UTF_16BE och UTF-16LE i java
@@ -198,9 +290,9 @@ void specifiedOrderWithBom() throws IOException {
     var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
                                    StandardCharsets.UTF_16BE);
     char c = (char) in.read();
-    Assertions.assertEquals(0xFEFF, c);
+    assertEquals(0xFEFF, c);
     c = (char) in.read();
-    Assertions.assertEquals('A', c);
+    assertEquals('A', c);
 
     out = new ByteArrayOutputStream();
     out.writeBytes(new byte[]{(byte) 0xFF, (byte) 0xFE, 0x41, 0x00});
@@ -208,43 +300,15 @@ void specifiedOrderWithBom() throws IOException {
     in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
                                StandardCharsets.UTF_16LE);
     c = (char) in.read();
-    Assertions.assertEquals(0xFEFF, c);
+    assertEquals(0xFEFF, c);
     c = (char) in.read();
-    Assertions.assertEquals('A', c);
+    assertEquals('A', c);
 }
 ```
 
 ???
 - Understryk ordningen av byte array.
-- Byte Order Mark erhålls som första bokstav pga av byte order angetts explicit i BE och LE
-
-
----
-# Detektera byte order med java
-```java
-// BOM=U+FEFF, A=U+0041
-@Test
-void detectByteOrder() throws IOException {
-    var out = new ByteArrayOutputStream();
-    out.writeBytes(new byte[]{(byte) 0xFE, (byte) 0xFF, 0x00, 0x41});
-
-    var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                                   StandardCharsets.UTF_16);
-    char c = (char) in.read();
-    Assertions.assertEquals('A', c);
-
-    out = new ByteArrayOutputStream();
-    out.writeBytes(new byte[]{(byte) 0xFF, (byte) 0xFE, 0x41, 0x00});
-
-    in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                               StandardCharsets.UTF_16);
-    c = (char) in.read();
-    Assertions.assertEquals('A', c);
-}
-```
-
-???
-- Notera att BOM inte läses till applikationen.
+- Byte Order Mark erhålls som första bokstav pga av byte order angivits explicit i BE och LE
 
 
 ---
@@ -259,7 +323,7 @@ void defaultUtf16() throws IOException {
     var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
                                    StandardCharsets.UTF_16);
     char c = (char) in.read();
-    Assertions.assertEquals('A', c);
+    assertEquals('A', c);
 
     out = new ByteArrayOutputStream();
     out.writeBytes(new byte[]{0x41, 0x00});
@@ -268,7 +332,7 @@ void defaultUtf16() throws IOException {
                                StandardCharsets.UTF_16);
     c = (char) in.read();
     // 䄀=U+4100
-    Assertions.assertEquals('䄀', c);
+    assertEquals('䄀', c);
 }
 ```
 
@@ -278,60 +342,69 @@ void defaultUtf16() throws IOException {
 
 
 ---
-# 16 bits räcker inte
+# 16 bitar räcker inte
 
 - Räcker inte för historiska skriftspråk
 
 - Räcker inte för alla möjliga emojis och varianter på dessa
 
-- Tillåt fler genom att ibland kombinera speciella 16-bitars värden
+- Tillåt fler i UTF-16 genom att kombinera speciella 16-bitars värden
 
 
 ---
 # Surrogatkodpunkter
-- Om första värdet är en *high surrogate*, i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värder)...
+- Om första värdet är en .blue[high surrogate], i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värder)...
   
-- så kombineras den med en följande *low surrogate*, i intervallet U+DC00 till U+DFFF (återigen 1,024 möjliga värden)
+- så kombineras den med en följande .red[low surrogate], i intervallet U+DC00 till U+DFFF (återigen 1,024 möjliga värden)
   
-
----
-# Unicodes namnrymd
-- Totalt möjliga värden:
-  - 2^16 - 2\*1024 + 1024\*1024 = 1,112,064
-
-- Unicode kommer inte definiera utanför den mängden
-  
-- 836,536 lediga tecken (**Reserverade**, dvs tillgängliga för användning men ännu inte definierade) i senaste Unicode 12.1
-
----
-# Unicodes namnrymd
-- Totalt möjliga värden:
-  - 2^16 - 2\*1024 + 1024\*1024 = 1,112,064
-
-- Unicode kommer inte definiera utanför den mängden
-  
-- 836,536 lediga tecken (**Reserverade**, dvs tillgängliga för användning men ännu inte definierade) i senaste Unicode 12.1
-
-
 ---
 # Hur ser det ut på bit-nivå?
 
-```
-U' = yyyyyyyyyyxxxxxxxxxx  // U - 0x10000
-W1 = 110110yyyyyyyyyy      // 0xD800 + yyyyyyyyyy
-W2 = 110111xxxxxxxxxx      // 0xDC00 + xxxxxxxxxx
-```
+Kodpunkt = .blue[yyyyyyyyyy].red[xxxxxxxxxx]
+
+Låg surrogat = 110110.blue[yyyyyyyyyy]
+
+Hög surrogat = 110111.red[xxxxxxxxxx]
+
+
+---
+# Unicodes namnrymd
+- Totalt möjliga värden:
+  - 2^16 - 2\*1024 + 1024\*1024 = 1,112,064
+
+- Unicode kommer inte definiera utanför den mängden
+  
+- 836,536 lediga tecken (**Reserverade**, dvs tillgängliga för användning men ännu inte definierade) i senaste Unicode 12.1
+
+???
+- Finns alltså gott om utrymme, Unicode har utlovat i en stabilitetspolicy att aldrig definiera mer än så här många tecken
 
 ---
 # Java och UTF-16
-- "Java använder UTF-16"
-
-- Java har en primitiv *char*, 16 bitar
+- I java är en **char** 16 bitar, så är baserat på UTF-16
 
 - `String.length()` returnerar antal UTF-16 värden, inte antal kodpunkter
 
 - Kodpunkter som kräver två 16 bitars är ofta ovanliga
   - Många system hanterar inte detta korrekt
+  
+---
+# Unicode literals i java
+
+Via syntaxen '.red[\u].blue[XXXX]', dvs .red[\u] följt av fyra hexadecimala siffror, så kan 16-bitars kodpunkter uttryckas.
+
+```java
+@Test
+void literals() {
+    assertEquals(0x41, '\u0041');
+    assertEquals('A', '\u0041');
+    // U+1F600 (GRINNING FACE) kräver ett surrogatpar:
+    assertEquals("😀", "\uD83D\uDE00");
+}
+```
+
+???
+- Observera att GRINNING FACE kräver två java characters, ett surrogatpar
   
 ---
 # Java-sträng från bytes och till bytes
@@ -354,7 +427,7 @@ for (int i = 0; i < string.length(); i++) {
     int codePoint;
     if (Character.isHighSurrogate(c1)) {
         i++;
-        char c2 = string.charAt(i + 1);
+        char c2 = string.charAt(i);
         if (Character.isLowSurrogate(c2)) {
             throw new IllegalArgumentException("What?");
         } else{
@@ -396,23 +469,39 @@ public static void main(String[] args) {
 }
 ```
 
+🙃?
+
+???
+- Se nästa slide  
+
 ---
 # Felhantering i UTF-16
-- Skriver ut en 🙃=U+1F643, följt av ?=U+003F.
+- Skriver ut en 🙃=.blue[U+1F643], följt av ?=.red[U+003F]
 
-- Detta är betendet på `PrintStream`-instansen i `System.out` - det finns API:er för att hantera fel på andra sätt.
+- Detta är betendet på `PrintStream`-instansen i `System.out` - det finns API:er för att hantera fel på andra sätt
 
 - Fel här kan vara en hög surrogatkodpunkt som inte följs av låg, eller låg som inte föregås av hög.
 
+---
+# UCS-2
+- UCS-2 är en gammal teckenenkoding som i princip är UTF-16 utan surrogatpar
+
+???
+- Bra att känna till (men används inte)
+- Nu lämnar vi 16 bitars enkodning bakom oss!
 
 ---
-# UTF-32
+# UTF-32 (eller UCS-4)
 
-- Varför inte bara skriva ut varje kodpunkt som ett 32-bitars värde?
+- Varför inte bara encode:a ut varje kodpunkt som ett 32-bitars värde?
 
-- UTF-32 - enkelt, men används väldigt lite i praktiken.
+- UTF-32 - enkelt, men används väldigt lite i praktiken
 
-- Endian-problemet återkommer, så UTF-32BE och UTF-32LE precis som i java.
+- Endian-problemet återkommer, så UTF-32BE och UTF-32LE precis som med 16-bitars teckenkodning
+
+???
+- Obs att antal kodpunkter fortfarande är begränsat till de som kan uttryckas i Unicode, så  1,112,064 totalt
+- UCS-4 är samma sak som UTF-32
 
 ---
 # UTF-24?
@@ -421,13 +510,15 @@ public static void main(String[] args) {
 
 - Fanns förslag om UTF-24 men accepterades aldrig
 
+???
+- Nu paus, sen går vi igenom UTF-8, den vanligaste och mest praktiskt användbara teckenkodningen
 
 ---
 # UTF-8
 
-- UTF-16 är 16-bitars värden som vid behov kan kombineras **med ett annat värde** för att ge en kodpunkt med högt värde
+- UTF-16 är 16-bitars värden som vid behov kan kombineras .blue[**med ett annat värde**] för att ge en kodpunkt med högt värde
 
-- UTF-8 är 8-bitars värden som vid behov kan kombineras **med upp till tre andra värden** för att ge en kodpunkt med högt värde
+- UTF-8 är 8-bitars värden som vid behov kan kombineras .red[**med upp till tre andra värden**] för att ge en kodpunkt med högt värde
 
 
 ---
@@ -440,7 +531,7 @@ public static void main(String[] args) {
 
 ---
 # UTF-8, hur ser det ut?
-- Bakåtkompatibilitet med ASCII, så upp till sju bitar representeras på samma sätt: 0x0.red[xxxxxxx]
+- Bakåtkompatibilitet med ASCII, så upp till sju bitar representeras på samma sätt: 0.red[xxxxxxx]
 
 - 110xxxxx + 10xxxxxx
 
@@ -450,42 +541,44 @@ public static void main(String[] args) {
 
 ---
 # Continuation bytes
-- 110xxxxx + 10xxxxxx
+- .blue[110]xxxxx + .red[10]xxxxxx
 
-- 1110xxxx + 10xxxxxx + 10xxxxxx
+- .blue[1110]xxxx + .red[10]xxxxxx + .red[10]xxxxxx
 
-- 11110xxx + 10xxxxxx + 10xxxxxx + 10xxxxxx
+- .blue[11110]xxx + .red[10]xxxxxx + .red[10]xxxxxx + .red[10]xxxxxx
 
-- En inledande byte (110xxxxx/1110xxxx/11110xxx) som följs av *continuation bytes* (10xxxxxx)
+- En inledande byte (.blue[110]xxxxx/.blue[1110]xxxx/.blue[11110]xxx) som följs av *continuation bytes* (.red[10]xxxxxx)
 
 ---
-# Upp till 21 bitar
+# Maxvärde upp till 21 bitar
 
-- 11110xxx + 10xxxxxx + 10xxxxxx + 10xxxxxx är 21 bitar, vilket är tillräckligt för att täcka Unicodes namnrymd på 1,112,064 värden
+- .blue[11110]xxx + .red[10]xxxxxx + .red[10]xxxxxx + .red[10]xxxxxx
+
+- Är 21 bitar, vilket är tillräckligt för att täcka Unicodes namnrymd på 1,112,064 värden
 
 
 ---
 # UTF-8 är självsynkroniserande
 - Hoppas det in mitt i en UTF-8 ström kommer inte en felaktigt värde avläsas
 
-- Istället kan continuation bytes (10xxxxxx) skippas (max 3 st) innan strömmen kan börja avläsas igen
+- Istället kan continuation bytes (.red[10]xxxxxx) skippas (max 3 st) innan strömmen kan börja avläsas igen
 
 ---
 # UTF-8: Overlong encodings
-- 0xxxxxxx för sju bitar
-- 110.red[xxxx]x + 10xxxxxx för 8 till 11 bitar
+- 0.blue[xxxxxxx] för sju bitar
+- 110.red[xxxx].blue[x] + 10.blue[xxxxxx] för 8 till 11 bitar
 
-- Om rödmarkerade bitar sätts till 0 så kan ASCII-tecken representeras på två sätt.
-  - Och liknande för längre sekvenser.
-  - Tillåts inte: mappning kodpunkt <-> serialisering i UTF-8 ett till ett, minimal längd på enkodning måste användas.
+- Om rödmarkerade bitar sätts till 0 så kan ASCII-tecken representeras på två sätt
+  - Och liknande för längre sekvenser
+  - Tillåts inte: mappning kodpunkt <-> serialisering i UTF-8 ett till ett, minimal längd på enkodning måste användas
   
 ---
 # UTF-8: För stora värden
 - 11110xxx + 10xxxxxx + 10xxxxxx + 10xxxxxx
 
-- 21 bits räcker för Unicodes namnrymd på 1,112,064 - men kan också uttrycka större värden.
+- 21 bits räcker för Unicodes namnrymd på 1,112,064 - men kan också uttrycka större värden (2,097,151)
 
-- Om värdet är för stort är det ogiltigt UTF-8.
+- Om värdet är för stort är det ogiltigt UTF-8
 
 
 ---
@@ -517,7 +610,7 @@ public static void main(String[] args) {
 - En decoder kan kasta exception eller avbryta inläsning
   - Kan leda till denial of service eller säkerhetshål om oväntat
 
-- Används inte av javas standardbibliotek.
+- Används inte av javas standardbibliotek
 
 ---
 # Felhantering: Byt ut fel mot ersättningsbokstav
@@ -530,7 +623,7 @@ public static void main(String[] args) {
 void för_i_iso_8859_1_inläst_som_utf8() {
     byte[] för_i_iso_8859_1 = new byte[]{'f', (byte) 0xF6, 'r' };
     String s = new String(för_i_iso_8859_1, StandardCharsets.UTF_8);
-    Assertions.assertEquals("f\uFFFDr", s);
+    assertEquals("f\uFFFDr", s);
 }
 ```
 
@@ -539,11 +632,11 @@ void för_i_iso_8859_1_inläst_som_utf8() {
 
 ---
 # Unicode som databas
-- Unicode kan ses som en versionerad databas som definierar egenskaper för kodpunkter
+- Unicode kan ses som en **versionerad databas** som definierar egenskaper för kodpunkter
 
-- Namn är en egenskap:
-  - U+0041 (A) har namnet "LATIN CAPITAL LETTER A"
-  - U+1F4A9 (💩) har namnet "PILE OF POO"
+- .blue[Namn] är en egenskap:
+  - U+0041 (A) har namnet ".blue[LATIN CAPITAL LETTER A]"
+  - U+1F4A9 (💩) har namnet ".blue[PILE OF POO]"
   
 ---
 # Namn av code point i java
@@ -586,24 +679,73 @@ JDK 1.0        January 23, 1996     Unicode 1.1.5
 
 ---
 # General category
-Varje kodpunkt har en [General Category](https://en.wikipedia.org/wiki/Unicode_character_property#General_Category)
+Varje kodpunkt har en [General Category](https://en.wikipedia.org/wiki/Unicode_character_property#General_Category) som berättar vad det är för typ av tecken
 
 Kan erhållas med hjälp av `Character.getType(int codePoint)`:
 
 ```java
 @Test
 void generalCategory() {
-    assertEquals(Character.CONNECTOR_PUNCTUATION, Character.getType('_'));
-    assertEquals(Character.MATH_SYMBOL, Character.getType('='));
-    assertEquals(Character.SURROGATE, Character.getType(0xD800));
+    assertEquals(Character.CONNECTOR_PUNCTUATION, Character.getType(''));
 }
 ```
 
----
-# Plan i unicode
+???
+- Följ länken och gå igenom på wikipedia vad det finns för några, för en känsla
 
-- Gå igenom hur många, namn
-- Visa bild på BMP: https://en.wikipedia.org/wiki/UTF-16#/media/File:Unifont_Full_Map.png
+---
+# Private use characters
+- Det finns totalt 137,468 kodpunkter som har kategorin **private use**
+
+- "Private-use characters are code points whose interpretation is not specified by a character encoding standard and whose use and interpretation may be determined by private agreement among cooperating users"
+
+---
+# Private use exempel: Apple logotyp
+- Apple ville/kunde inte gå igenom en standardiseringsprocess för att få en kodpunkt för dess logotyp
+
+- Definierade  U+F8FF som deras logotyp
+
+```java
+@Test
+void generalCategory() {
+    assertEquals(Character.PRIVATE_USE, Character.getType(''));
+}
+```
+
+???
+- Stöds på Mac och iOS eftersom det är Apples platform - behöver inte stödjas på andra plattformar
+
+---
+# Unicode plan
+
+- Kodpunkterna är uppdelade i 17 plan, där varje plan har 65 536 (2^16) kodpunkter
+  - Sista planet kan inte användas fullt ut pga 21-bitars begränsningen
+
+- **Plane 0** heter **Basic Multilingual Plane (BMP)**
+  - https://en.wikipedia.org/wiki/UTF-16#/media/File:Unifont_Full_Map.png
+  
+???
+- Varje rad är 256 tecken lång
+- Observera 8 (pga 1024+1024 = 8*256) gråa rader för surrogate characters
+- Efter detta många vita rader för private use characters
+
+---
+# Fler plan
+- Plan 1: Supplementary Multilingual Plane (SMP)
+- Plan 2: Supplementary Ideographic Plane (SIP)
+- Plan 3 till 13: Ej tilldelade
+- Plan 14: Supplementary Special-purpose Plane (SSP)
+- Plan 15 och 16: Private use planes
+
+---
+# Noncharacters
+- Det finns 66 kodpunkter som kallas **noncharacters** (icke-bokstäver)
+- Ska inte dyka upp i text som utbyts mellan system
+- Ett intervall av 32 noncharacters i BMP (U+FDD0..U+FDEF)
+- Sista två kodpunkterna i varje plan: .red[U+FFFE], U+FFFF, U+1FFFE, U+1FFFF, U+2FFFE, U+2FFFF, ... U+10FFFE, U+10FFFF
+
+???
+- Lägg märke till FFFE i rött, vilken är den andra byte-ordningen på BOM (byte order marker) i UTF-16, vilken alltså inte ska dyka upp
 
 
 ---
@@ -647,18 +789,16 @@ Med hjälp av `Character.getType(codePoint)` kan vi se erhålla Unicode kategori
 
 ---
 # Bokstäver som kan uttryckes både med och utan modifier
-(Ekvivalens pga combining and precomposed characters)
+Ekvivalens mellan .blue[precomposed character] och .red[combining character].
 Bokstaven **Å** kan uttryckas som
 
-- Kodpunkten `U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)`
-- Kodpunkten `U+0041 (LATIN CAPITAL LETTER A)` följt av `U+030A (COMBINING RING ABOVE)`:
+- Kodpunkten .blue[U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)]
+- Kodpunkten .red[U+0041 (LATIN CAPITAL LETTER A)] följt av .red[U+030A (COMBINING RING ABOVE)]
   - A +         	̊ = Å
 
 ---
 # Ekvivalens pga character duplication
-Förutom att skrivas med modifying character, så kan **Å** skrivas:
-
-- Kodpunkten `U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)`
+Förutom att skrivas med modifying character, så kan **Å** skrivas med en annan kodpunkt:
 
 - Kodpunkten `U+212B (ANGSTROM SIGN)`
 
@@ -743,51 +883,103 @@ Characters are decomposed and then recomposed by canonical equivalence.
 - Det är undantag bland filsystem att agera så, och nya filsystemet som ersatte detta gör inte inbyggd Unicode normalisation
 
 ---
-# Java kodexempel med Unicode normalization
-TODO
-
----
-# Bokstäver kan vara olika breda
-Från (BRAAA POST)
-https://manishearth.github.io/blog/2017/01/14/stop-ascribing-meaning-to-unicode-code-points/
-
-`U+FDFD (ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM)` är en kodpunkt som ser ut så här:
-﷽
-..
-
----
-# Gemener och versaler: Skillnader i antal kodpunkter
-Javas `String.toUpperCase()` hanterar komplexiteten i gemener&versaler.
-
-En sak att vara medveten om är att längden skiljer sig.
-
-- ß U+00DF LATIN SMALL LETTER SHARP S
-
-S U+0053 LATIN CAPITAL LETTER S
-S U+0053 LATIN CAPITAL LETTER S
-
+# Unicode normalization: Kodexempel i java
 
 ```java
-void upper() {
-    // ß U+00DF LATIN SMALL LETTER SHARP S
-    // till versaler blir
-    // S U+0053 LATIN CAPITAL LETTER S
-    // S U+0053 LATIN CAPITAL LETTER S
-    Assertions.assertEquals("ß".toUpperCase(), "SS");
+@Test
+void normalization() {
+    //  U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)
+    String s1 = "\u00C5"; 
+    // U+0041 (LATIN CAPITAL LETTER A), U+030A (COMBINING RING ABOVE)
+    String s2 = "\u0041\u030A";
+    // U+212B (ANGSTROM SIGN)
+    String s3 = "\u212B";
+
+    String n1 = Normalizer.normalize(s1, Normalizer.Form.NFD);
+    String n2 = Normalizer.normalize(s2, Normalizer.Form.NFD);
+    String n3 = Normalizer.normalize(s3, Normalizer.Form.NFD);
+
+    assertEquals(n1, n2);
+    assertEquals(n2, n3);
+
+    assertEquals("\u00C5", Normalizer.normalize("\u0041\u030A", Form.NFC));
+    assertEquals("\u00C5", Normalizer.normalize("\u00C5", Form.NFC));
+    assertEquals("\u0041\u030A", Normalizer.normalize("\u0041\u030A", Form.NFD));
+    assertEquals("\u0041\u030A", Normalizer.normalize("\u00C5", Form.NFD));
 }
 ```
 
 ---
-# Gemener och versaler: Skillnad mellan språk
-TODO: "i".toUpperCase(Locale.forLanguageTag("tr")) blir annorlunda på turkiska, 
+# Creative usernames and Spotify account hijacking
 
-- `I U+0049 LATIN CAPITAL LETTER I`
-- `İ U+0130 LATIN CAPITAL LETTER I WITH DOT ABOVE` på turkiska
-  - Eller `U+0049 LATIN CAPITAL LETTER I` följt av `U+0307 COMBINING DOT ABOVE` för decomposed.
+https://labs.spotify.com/2013/06/18/creative-usernames/
+
+---
+# Bokstäver kan vara olika breda
+- `U+FDFD (ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM)` är en kodpunkt som ser ut så här:
+﷽
+
+- Och tecken som har ingen bredd, tecken som kombinerar med föregående för att ändra bredd osv
+
+- Använda `String.length()` som mått på hur mycket utrymme en sträng tar på skärmen fungerar inte för mer komplexa kodpunkter
+
+---
+# Gemener och versaler: Skillnader i antal kodpunkter
+- Javas `String.toUpperCase()` och `String.toLowerCase()` hanterar komplexiteten i gemener&versaler
+
+- Längden på strängen kan ändras av detta, exempelvis blir .red[ß U+00DF LATIN SMALL LETTER SHARP S] till en sekvens av två .blue[S U+0053 LATIN CAPITAL LETTER S]
+
+---
+# Gemener och versaler: Skillnad mellan språk
+- .red[String.toUpperCase()] default:ar till systemets Locale
+- Men att gå mellan gemener och versaler är språkberoende, därför: .blue[String.toUpperCase(locale)]
+
+- Exempel: För turkiska blir .red[i U+0069 (LATIN SMALL LETTER I)] som versal .blue[İ U+0130 LATIN CAPITAL LETTER I WITH DOT ABOVE]
 
 
 ---
-# TODO: Collation?
-Inspiration from:
-https://manishearth.github.io/blog/2017/01/15/breaking-our-latin-1-assumptions/
-TODO: Mention uniview? https://r12a.github.io/uniview/?charlist=%F0%9F%91%A9%E2%80%8D%F0%9F%91%A9%E2%80%8D%F0%9F%91%A7%E2%80%8D%F0%9F%91%A6
+# Gemener och versaler: Exempel i java
+```java
+@Test
+void upperCase() {
+    // I: U+0049 (LATIN CAPITAL LETTER I)
+    assertEquals("\u0049", "i".toUpperCase(Locale.ENGLISH));
+    // I: U+0049 (LATIN CAPITAL LETTER I)
+    assertEquals("\u0130", "i".toUpperCase(Locale.forLanguageTag("tr")));
+
+    assertEquals("SS", "ß".toUpperCase(Locale.ENGLISH));
+}
+```
+
+---
+# Uniview
+- Uniview (https://r12a.github.io/uniview/) är ett verktyg för att debugga och visualisera Unicode-sekvenser
+
+- Kan länka in med sekvenser av kodpunkter:
+  - 👩‍👩‍👧‍👦 - en familj! Vilken sekvens är det här?
+  - https://r12a.github.io/uniview/?charlist=👩‍👩‍👧‍👦
+
+---
+# Grapheme cluster
+- Ett **grapheme cluster** är ungefär en **användarupplevd bokstav**
+  - En eller flera kodpunkter
+  - T.ex. 👩‍👩‍👧‍👦 (sju kodpunkter) är ett grapheme cluster
+  - En text selection i ett GUI kommer normalt aldrig sluta mitt i ett grafem kluster
+  - Önskningen ".red[ta bort sista bokstaven]" motsvarar ofta att .blue[ta bort sista grafem klustret]
+
+
+---
+# ICU project
+
+- http://site.icu-project.org/home
+
+- "ICU is a mature, widely used set of C/C++ and Java libraries providing Unicode and Globalization support for software"
+
+- Om en Unicode-funktionalitet saknas i javas standardbibliotek finns det antagligen i ICU
+
+- Innehåller bland annat stöd för grapheme clusters
+
+---
+# Quiz time!
+
+![Quiz time](images/quiz.webp)
