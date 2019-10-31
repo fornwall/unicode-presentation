@@ -1010,7 +1010,7 @@ void upperCase() {
 
 ???
 - Förut räknade twitter varje kodpunkt
-- Nu räknas varje emoji som två bokstäver
+- Från och med oktober 2018 räknas varje emoji som två bokstäver
 
 ---
 # Sortering
