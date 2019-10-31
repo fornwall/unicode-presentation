@@ -752,13 +752,14 @@ void generalCategory() {
 # Combining characters
 - En combining character modifierar andra bokstäver, som när `U+0306 (COMBINING BREVE)` nedan modifierar `U+0079 (LATIN SMALL LETTER Y)`.
 
-![y och breve](combining.svg)
+.center[![y och breve](combining.svg)]
 
 ---
 # Combining characters: Emoji modifier
 Ett annat exempel på modifiers är de som anger hudfärg på emojis, som `U+1F3FE (EMOJI MODIFIER FITZPATRICK TYPE-5)` nedan:
 
-![emoji och skin tone](skin-modifier.png)
+
+.center[![emoji och skin tone](skin-modifier.png)]
 
 ---
 # Combining characters: Multiple
@@ -888,24 +889,30 @@ Characters are decomposed and then recomposed by canonical equivalence.
 ```java
 @Test
 void normalization() {
-    //  U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)
+    // U+00C5 (LATIN CAPITAL LETTER A WITH RING ABOVE)
     String s1 = "\u00C5"; 
-    // U+0041 (LATIN CAPITAL LETTER A), U+030A (COMBINING RING ABOVE)
+    // U+0041 (LATIN CAPITAL LETTER A)
+    // U+030A (COMBINING RING ABOVE)
     String s2 = "\u0041\u030A";
     // U+212B (ANGSTROM SIGN)
     String s3 = "\u212B";
 
-    String n1 = Normalizer.normalize(s1, Normalizer.Form.NFD);
-    String n2 = Normalizer.normalize(s2, Normalizer.Form.NFD);
-    String n3 = Normalizer.normalize(s3, Normalizer.Form.NFD);
+    String n1 = Normalizer.normalize(s1, Form.NFD);
+    String n2 = Normalizer.normalize(s2, Form.NFD);
+    String n3 = Normalizer.normalize(s3, Form.NFD);
 
+    // TODO: verify that assertEquals(n1, "\u0041\u030A"); Och ta bort exemplena längst ner?
     assertEquals(n1, n2);
     assertEquals(n2, n3);
 
-    assertEquals("\u00C5", Normalizer.normalize("\u0041\u030A", Form.NFC));
-    assertEquals("\u00C5", Normalizer.normalize("\u00C5", Form.NFC));
-    assertEquals("\u0041\u030A", Normalizer.normalize("\u0041\u030A", Form.NFD));
-    assertEquals("\u0041\u030A", Normalizer.normalize("\u00C5", Form.NFD));
+    assertEquals("\u00C5",
+    	Normalizer.normalize("\u0041\u030A", Form.NFC));
+    assertEquals("\u00C5",
+    	Normalizer.normalize("\u00C5", Form.NFC));
+    assertEquals("\u0041\u030A",
+    	Normalizer.normalize("\u0041\u030A", Form.NFD));
+    assertEquals("\u0041\u030A",
+    	Normalizer.normalize("\u00C5", Form.NFD));
 }
 ```
 
@@ -952,14 +959,6 @@ void upperCase() {
 ```
 
 ---
-# Uniview
-- Uniview (https://r12a.github.io/uniview/) är ett verktyg för att debugga och visualisera Unicode-sekvenser
-
-- Kan länka in med sekvenser av kodpunkter:
-  - 👩‍👩‍👧‍👦 - en familj! Vilken sekvens är det här?
-  - https://r12a.github.io/uniview/?charlist=👩‍👩‍👧‍👦
-
----
 # Grapheme cluster
 - Ett **grapheme cluster** är ungefär en **användarupplevd bokstav**
   - En eller flera kodpunkter
@@ -978,6 +977,74 @@ void upperCase() {
 - Om en Unicode-funktionalitet saknas i javas standardbibliotek finns det antagligen i ICU
 
 - Innehåller bland annat stöd för grapheme clusters
+
+---
+# Uniview
+- Uniview (https://r12a.github.io/uniview/) är ett verktyg för att debugga och visualisera Unicode-sekvenser
+
+- Kan länka in med sekvenser av kodpunkter:
+  - 👩‍👩‍👧‍👦 - en familj! Vilken sekvens är det här?
+  - https://r12a.github.io/uniview/?charlist=👩‍👩‍👧‍👦
+
+---
+# Twitter, emojis och jämlikhet
+
+- [💁](https://r12a.github.io/uniview/?charlist=💁) Emoji: 2
+
+- [💁🏽] Emoji + skin tone: 4
+
+💁‍♂️ Emoji + gender: 7
+
+💁🏽‍♂️ Emoji + gender + skin tone: 9
+
+👨‍👩‍👧 Family with 3 people: 8
+
+👨‍👩‍👧‍👦 Family with 4 people: 11
+
+🇳🇴 Country Flag: 4
+
+🏳️‍🌈 Rainbow Flag: 7
+
+🏴󠁧󠁢󠁳󠁣󠁴󠁿 Subdivision Flag: 14
+
+
+???
+- Förut räknade twitter varje kodpunkt
+- Nu räknas varje emoji som två bokstäver
+
+---
+# Sortering
+
+```java
+@Test
+void swedish() {
+  var collator = Collator.getInstance(Locale.forLanguageTag("sv"));
+  var list = Arrays.asList("a", "b", "c");
+  list.sort(collator);
+  Assertions.assertEquals(List.of("a", "b", "c"), list);
+}
+
+@Test
+void lithuanian() {
+  var collator = Collator.getInstance(Locale.forLanguageTag("lt"));
+  var list = Arrays.asList("i", "k", "y");
+  list.sort(collator);
+  Assertions.assertEquals(List.of("i", "y", "k"), list);
+}
+
+@Test
+void german() {
+  var collator = Collator.getInstance(Locale.forLanguageTag("de"));
+  var list = Arrays.asList("a", "b", "ä");
+  list.sort(collator);
+  Assertions.assertEquals(List.of("a", "ä", "b"), list);
+}
+
+???
+- Sortering (i den betydelsen hur användare normalt förväntar sig sorterade, listor av strängar att visas), är språkberoende
+- Finns stöd för detta i javas standardbibliotek: java.text.Collator (highlight:a i koden)
+- För t.ex. lituaiska sorteras y mellan i och k
+- För t.ex. tyska sorteras ä strax efter a
 
 ---
 # Quiz time!
