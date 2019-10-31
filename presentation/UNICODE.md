@@ -5,9 +5,11 @@ class: center, middle
 # Mål
 
 - Veta vad UTF-8, UTF-16 och UTF-32 är
-- Få en insikt i historiken för att förstå nuvarande system
+- Få en insikt i historiken för att förstå nuvarande konstruktioner
+- Veta hur encoding problem kan uppstå och åtgärdas
 - Veta vad Unicode normalization är
-- Veta hur kodpunkter kan användas i java
+- Veta om antaganden som ofta fungerar på svenska men som inte gäller för andra språk
+- Veta hur java kan användas för att behandla Unicode
 
 ---
 # Det började med bilder...
@@ -65,7 +67,7 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 
 - **ISO 8859-1** (eller **latin1**) den vanligaste i västvärlden
 
-- ÅÄÖ (och ØÑØÙß..) har värden definierade
+- ÅÄÖ (och ØÑÙß..) har värden definierade
   
 - Stödjer "västeuropeiska" språk (men inte alla, och inte fullt ut)
 
@@ -168,7 +170,7 @@ In a properly engineered design, 16 bits per character are more than sufficient 
   
   - Används av intelprocessorer
   
-  - ∞=0x221E blir representerat som bytet-sekvensen `{0x1E, 0x22}`
+  - ∞=0x221E blir representerat som byte-sekvensen `{0x1E, 0x22}`
 
 ---
 # UTF-16BE och UTF16LE
@@ -224,7 +226,7 @@ In a properly engineered design, 16 bits per character are more than sufficient 
   - StandardCharsets.UTF_8
   - StandardCharsets.UTF_16
   - StandardCharsets.UTF_16BE
-  - StandardCharsets.UTF16_LE
+  - StandardCharsets.UTF_16LE
 
 ???
 - Låt oss gå in på java
@@ -242,8 +244,8 @@ try {
 ```
 
 ```java
-// För standard charsets (som UTF-8 ovan) är det dock onödigt med ovanstående
-// konstruktion (från och med java 7), eftersom dessa charset alltid stöds:
+// För standard charsets (som UTF-8 ovan) är det dock onödigt,
+// (från och med java 7), eftersom dessa charset alltid stöds:
 doSomethingWithCharset(StandardCharsets.UTF_16);
 ```
 
@@ -254,18 +256,20 @@ doSomethingWithCharset(StandardCharsets.UTF_16);
 @Test
 void detectByteOrder() throws IOException {
     var out = new ByteArrayOutputStream();
-    out.writeBytes(new byte[]{(byte) 0xFE, (byte) 0xFF, 0x00, 0x41});
+    out.writeBytes(new byte[]{(byte)0xFE, (byte)0xFF, 0x00, 0x41});
 
-    var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                                   StandardCharsets.UTF_16);
+    var in = new InputStreamReader(new ByteArrayInputStream(
+                                    out.toByteArray()),
+                                    StandardCharsets.UTF_16);
     char c = (char) in.read();
     assertEquals('A', c);
 
     out = new ByteArrayOutputStream();
-    out.writeBytes(new byte[]{(byte) 0xFF, (byte) 0xFE, 0x41, 0x00});
+    out.writeBytes(new byte[]{(byte)0xFF, (byte)0xFE, 0x41, 0x00});
 
-    in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                               StandardCharsets.UTF_16);
+    in = new InputStreamReader(new ByteArrayInputStream(
+                                out.toByteArray()),
+                                StandardCharsets.UTF_16);
     c = (char) in.read();
     assertEquals('A', c);
 }
@@ -280,25 +284,23 @@ void detectByteOrder() throws IOException {
 # Läsa UTF_16BE och UTF-16LE i java
 
 ```java
-// BOM=U+FEFF, A=U+0041
-// OBS: Dåligt som exempel, BOM ska inte användas när byte order anges explicit
 @Test
 void specifiedOrderWithBom() throws IOException {
     var out = new ByteArrayOutputStream();
-    out.writeBytes(new byte[]{(byte) 0xFE, (byte) 0xFF, 0x00, 0x41});
-
-    var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                                   StandardCharsets.UTF_16BE);
+    out.writeBytes(new byte[]{(byte)0xFE, (byte)0xFF, 0x00, 0x41});
+    var in = new InputStreamReader(new ByteArrayInputStream(
+                                    out.toByteArray()),
+                                    StandardCharsets.UTF_16BE);
     char c = (char) in.read();
     assertEquals(0xFEFF, c);
     c = (char) in.read();
     assertEquals('A', c);
 
     out = new ByteArrayOutputStream();
-    out.writeBytes(new byte[]{(byte) 0xFF, (byte) 0xFE, 0x41, 0x00});
-
-    in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                               StandardCharsets.UTF_16LE);
+    out.writeBytes(new byte[]{(byte)0xFF, (byte)0xFE, 0x41, 0x00});
+    in = new InputStreamReader(new ByteArrayInputStream(
+                                out.toByteArray()),
+                                StandardCharsets.UTF_16LE);
     c = (char) in.read();
     assertEquals(0xFEFF, c);
     c = (char) in.read();
@@ -320,16 +322,18 @@ void defaultUtf16() throws IOException {
     var out = new ByteArrayOutputStream();
     out.writeBytes(new byte[]{0x00, 0x41});
 
-    var in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                                   StandardCharsets.UTF_16);
+    var in = new InputStreamReader(new ByteArrayInputStream(
+                                    out.toByteArray()),
+                                    StandardCharsets.UTF_16);
     char c = (char) in.read();
     assertEquals('A', c);
 
     out = new ByteArrayOutputStream();
     out.writeBytes(new byte[]{0x41, 0x00});
 
-    in = new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
-                               StandardCharsets.UTF_16);
+    in = new InputStreamReader(new ByteArrayInputStream(
+                                out.toByteArray()),
+                                StandardCharsets.UTF_16);
     c = (char) in.read();
     // 䄀=U+4100
     assertEquals('䄀', c);
@@ -348,12 +352,12 @@ void defaultUtf16() throws IOException {
 
 - Räcker inte för alla möjliga emojis och varianter på dessa
 
-- Tillåt fler i UTF-16 genom att kombinera speciella 16-bitars värden
+- UTF-16 tillåter fler genom att kombinera speciella 16-bitars värden
 
 
 ---
 # Surrogatkodpunkter
-- Om första värdet är en .blue[high surrogate], i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värder)...
+- Om första värdet är en .blue[high surrogate], i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värden)...
   
 - så kombineras den med en följande .red[low surrogate], i intervallet U+DC00 till U+DFFF (återigen 1,024 möjliga värden)
   
@@ -429,9 +433,9 @@ for (int i = 0; i < string.length(); i++) {
         i++;
         char c2 = string.charAt(i);
         if (Character.isLowSurrogate(c2)) {
-            throw new IllegalArgumentException("What?");
+            codePoint = Character.toCodePoint(c1, c2);
         } else{
-            codePoint = Character.toCodePoint(c2, c1);
+            throw new IllegalArgumentException("What?");
         }
     } else {
         codePoint = c1;
@@ -506,7 +510,7 @@ public static void main(String[] args) {
 ---
 # UTF-24?
 
-- För 1,112,064, max antal kodpunkter, kan egentligen representeras med 21 bitar
+- För 1,112,064, max antal kodpunkter, ryms i 21 bitar
 
 - Fanns förslag om UTF-24 men accepterades aldrig
 
@@ -524,7 +528,8 @@ public static void main(String[] args) {
 ---
 # Varför UTF-8
 
-- Bakåtkompatibilitet med ASCII, i det att ASCII är ett subset av UTF-8, så alla ASCII filer är UTF-8 filer.
+- Bakåtkompatibilitet med ASCII, i det att ASCII är ett subset av UTF-8
+  - Alla ASCII-filer är giltiga UTF-8 filer
 
 - Utrymme i minne och lagring - om största delen av texten är ASCII (vilket i många sammanhang är fallet), dubblerar UTF-16 minnesanvändning (= ger sämre prestanda)
 
@@ -533,11 +538,11 @@ public static void main(String[] args) {
 # UTF-8, hur ser det ut?
 - Bakåtkompatibilitet med ASCII, så upp till sju bitar representeras på samma sätt: 0.red[xxxxxxx]
 
-- 110xxxxx + 10xxxxxx
+- 110.blue[xxxxx] + 10.blue[xxxxxx]
 
-- 1110xxxx + 10xxxxxx + 10xxxxxx
+- 1110.blue[xxxx] + 10.blue[xxxxxx] + 10.blue[xxxxxx]
 
-- 11110xxx + 10xxxxxx + 10xxxxxx + 10xxxxxx
+- 11110.blue[xxx] + 10.blue[xxxxxx] + 10.blue[xxxxxx] + 10.blue[xxxxxx]
 
 ---
 # Continuation bytes
@@ -572,6 +577,12 @@ public static void main(String[] args) {
   - Och liknande för längre sekvenser
   - Tillåts inte: mappning kodpunkt <-> serialisering i UTF-8 ett till ett, minimal längd på enkodning måste användas
   
+---
+# UTF-8: Byte-sekvens för kodpunkt är unik i byte-ström
+- En egenskap i UTF-8 (mha konstruktionen med initial och continuation byte) är att byte-sekvensen för en kodpunkt är unik
+  - Dvs, återfinns aldrig som som delmängd av något annat, eller överlappandes mellan olika kodpunkter
+  - För att räkna t.ex. antal 'A' räcker det att räkna antalet gånger byte-värdet 0x41 hittas
+
 ---
 # UTF-8: För stora värden
 - 11110xxx + 10xxxxxx + 10xxxxxx + 10xxxxxx
@@ -620,9 +631,9 @@ public static void main(String[] args) {
   
 ```java
 @Test
-void för_i_iso_8859_1_inläst_som_utf8() {
-    byte[] för_i_iso_8859_1 = new byte[]{'f', (byte) 0xF6, 'r' };
-    String s = new String(för_i_iso_8859_1, StandardCharsets.UTF_8);
+void iso88591ReadAsUtf8() {
+    byte[] b = new byte[]{'f', (byte) 0xF6, 'r' };
+    String s = new String(b, StandardCharsets.UTF_8);
     assertEquals("f\uFFFDr", s);
 }
 ```
@@ -648,7 +659,8 @@ void för_i_iso_8859_1_inläst_som_utf8() {
 @Test
 void codePointName() {
     var codePoint = 0x0041; // A
-    assertEquals("LATIN CAPITAL LETTER A", Character.getName(codePoint));
+    assertEquals("LATIN CAPITAL LETTER A",
+        Character.getName(codePoint));
     codePoint = 0x1F4A9; // 💩
     assertEquals("PILE OF POO", Character.getName(codePoint));
 }
@@ -686,7 +698,12 @@ Kan erhållas med hjälp av `Character.getType(int codePoint)`:
 ```java
 @Test
 void generalCategory() {
-    assertEquals(Character.CONNECTOR_PUNCTUATION, Character.getType(''));
+    assertEquals(Character.CONNECTOR_PUNCTUATION,
+        Character.getType('_'));
+    assertEquals(Character.MATH_SYMBOL,
+        Character.getType('='));
+    assertEquals(Character.SURROGATE,
+        Character.getType(0xD800));
 }
 ```
 
@@ -901,18 +918,12 @@ void normalization() {
     String n2 = Normalizer.normalize(s2, Form.NFD);
     String n3 = Normalizer.normalize(s3, Form.NFD);
 
-    // TODO: verify that assertEquals(n1, "\u0041\u030A"); Och ta bort exemplena längst ner?
+    assertEquals(n1, "\u0041\u030A");
     assertEquals(n1, n2);
     assertEquals(n2, n3);
 
     assertEquals("\u00C5",
     	Normalizer.normalize("\u0041\u030A", Form.NFC));
-    assertEquals("\u00C5",
-    	Normalizer.normalize("\u00C5", Form.NFC));
-    assertEquals("\u0041\u030A",
-    	Normalizer.normalize("\u0041\u030A", Form.NFD));
-    assertEquals("\u0041\u030A",
-    	Normalizer.normalize("\u00C5", Form.NFD));
 }
 ```
 
@@ -928,7 +939,7 @@ https://labs.spotify.com/2013/06/18/creative-usernames/
 
 - Och tecken som har ingen bredd, tecken som kombinerar med föregående för att ändra bredd osv
 
-- Använda `String.length()` som mått på hur mycket utrymme en sträng tar på skärmen fungerar inte för mer komplexa kodpunkter
+- `String.length()` som mått på hur mycket utrymme sträng tar visuellt fungerar inte
 
 ---
 # Gemener och versaler: Skillnader i antal kodpunkter
@@ -951,8 +962,10 @@ https://labs.spotify.com/2013/06/18/creative-usernames/
 void upperCase() {
     // I: U+0049 (LATIN CAPITAL LETTER I)
     assertEquals("\u0049", "i".toUpperCase(Locale.ENGLISH));
-    // I: U+0049 (LATIN CAPITAL LETTER I)
-    assertEquals("\u0130", "i".toUpperCase(Locale.forLanguageTag("tr")));
+
+    // İ U+0130 (LATIN CAPITAL LETTER I WITH DOT ABOVE)
+    assertEquals("\u0130", "i".toUpperCase(
+        Locale.forLanguageTag("tr")));
 
     assertEquals("SS", "ß".toUpperCase(Locale.ENGLISH));
 }
@@ -991,21 +1004,15 @@ void upperCase() {
 
 - [💁](https://r12a.github.io/uniview/?charlist=💁) Emoji: 2
 
-- [💁🏽] Emoji + skin tone: 4
+- [💁🏽](https://r12a.github.io/uniview/?charlist=💁🏽) Emoji + skin tone: 4
 
-💁‍♂️ Emoji + gender: 7
+- [💁‍♂️](https://r12a.github.io/uniview/?charlist) Emoji + gender: 7
 
-💁🏽‍♂️ Emoji + gender + skin tone: 9
+- [💁🏽‍♂️](https://r12a.github.io/uniview/?charlist=💁🏽‍♂️) Emoji + gender + skin tone: 9
 
-👨‍👩‍👧 Family with 3 people: 8
+- [🇳🇴](https://r12a.github.io/uniview/?charlist=🇳🇴) Country Flag: 4
 
-👨‍👩‍👧‍👦 Family with 4 people: 11
-
-🇳🇴 Country Flag: 4
-
-🏳️‍🌈 Rainbow Flag: 7
-
-🏴󠁧󠁢󠁳󠁣󠁴󠁿 Subdivision Flag: 14
+- [🏳️‍🌈](https://r12a.github.io/uniview/?charlist=🏳️‍🌈 ) Rainbow Flag: 7
 
 
 ???
@@ -1039,6 +1046,7 @@ void german() {
   list.sort(collator);
   Assertions.assertEquals(List.of("a", "ä", "b"), list);
 }
+```
 
 ???
 - Sortering (i den betydelsen hur användare normalt förväntar sig sorterade, listor av strängar att visas), är språkberoende

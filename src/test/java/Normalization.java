@@ -21,6 +21,7 @@ public class Normalization {
         String n2 = Normalizer.normalize(s2, Form.NFD);
         String n3 = Normalizer.normalize(s3, Form.NFD);
 
+        assertEquals(n1, "\u0041\u030A");
         assertEquals(n1, n2);
         assertEquals(n2, n3);
 
