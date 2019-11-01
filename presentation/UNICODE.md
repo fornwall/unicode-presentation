@@ -1,18 +1,21 @@
 class: center, middle
-# Något om Unicode
+# En djupdykning i Unicode
+
+.center[![Logotyp för Unicode konsortium](images/unicode-logo.jpg)]
+
+https://fornwall.net/unicode
 
 ---
-# Mål
+# Frågor som ska besvaras?
 
-- Veta vad UTF-8, UTF-16 och UTF-32 är
-- Få en insikt i historiken för att förstå nuvarande konstruktioner
-- Veta hur encoding problem kan uppstå och åtgärdas
-- Veta vad Unicode normalization är
-- Veta om antaganden som ofta fungerar på svenska men som inte gäller för andra språk
-- Veta hur java kan användas för att behandla Unicode
+- Vad är UTF-8, UTF-16 och UTF-32?
+- Hur kan historiken förklara nuvarande konstruktioner?
+- Vad är några vanliga encoding problem?
+- Vad är Unicode normalization och varför bör det användas?
+- Vad finns det för vanliga antaganden som inte fungerar över alla språk?
 
 ---
-# Det började med bilder...
+# Det började med tecken...
 
 ![Various writing systems](images/alphabets-old.png)
 
@@ -20,7 +23,7 @@ class: center, middle
 Skriftspråk, symboler för att representera skriftliga uttryck, har funnits länge.
 
 ---
-# ASCII
+# ASCII: Sju bitar
 
 - ASCII, American Standard Code for Information Interchange, arbetades fram under 60-talet
 
@@ -58,6 +61,7 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 
 - När åttonde biten blev tillgänglig fick det plats för mer
 - **Många** varianter som använde åttonde biten skapades
+  - Olika mellan olika länder (och vissa länder hade flera)
 
 ???
 - Vi ska bara nämna de två viktigaste
@@ -65,28 +69,15 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 ---
 # 8 bitars teckenkodning: ISO-8859-1
 
-- **ISO 8859-1** (eller **latin1**) den vanligaste i västvärlden
+- .blue[ISO 8859-1] (eller .red[latin1]) den vanligaste i västvärlden
 
 - ÅÄÖ (och ØÑÙß..) har värden definierade
   
-- Stödjer "västeuropeiska" språk (men inte alla, och inte fullt ut)
+- Stödjer ".green[västeuropeiska]" språk
+  - Men inte alla, och inte fullt ut
 
 ---
-# 8 bitars teckenkodning: Windows-1252
-
-- Användes som default i gamla Windows-komponenter
-
-- ISO-8859 lägger till ett 30-tal kontrolltecken (dvs "konstiga", icke-synliga tecken) till ASCII
-  
-- Windows-1252 har synliga bokstäver istället. Mer praktiskt för de flesta som hellre ville ha bokstäver än kontrolltecken
-
-???
-- Det är vanligt att Windows-1252 är felaktigt deklarerade som ISO-8859-1
-- Så vanligt att HTML5-specifikationen säger att dokument som utger sig för ISO-8859-1 ska behandlas som windows-1252
-  - Eftersom det är vanligare att bokstäverna används istället för kontrolltecken
-  
----
-# 8 bitar räcker inte heller så långt...
+# 8 bitar räcker inte heller långt
 
 - Räcker fortfarande inte långt internationellt
 
@@ -98,9 +89,9 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 ---
 # En universell teckenkodning?
 
-- Det vore önskvärt att kunna uttrycka all världens tecken med en standard
+- Det vore önskvärt att kunna uttrycka .red[all världens tecken med en standard]
 
-- Unicode, en idé om detta, arbetades fram i slutet på 80-talet
+- .blue[Unicode], en idé om detta, arbetades fram i slutet på 80-talet
 
 - Joe Becker från Xerox skapade ett första dokument för Unicode
 
@@ -110,18 +101,18 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 
 "Unicode is intended to address the need for a workable, reliable world text encoding.
 
-Unicode could be roughly described as "wide-body ASCII" that has been stretched to 16 bits to encompass the characters of all the world's **living languages**.
+Unicode could be roughly described as .green["wide-body ASCII" that has been stretched to 16 bits] to encompass the characters of all the world's .red[living languages].
 
-In a properly engineered design, 16 bits per character are more than sufficient for this purpose."
+In a properly engineered design, .blue[16 bits per character are more than sufficient for this purpose]."
 
 
 ---
 # Identitet för bokstäver oavsett teckenkodning
-- "Bokstäver" får en **identitet oavsett byte-representation**
+- "Bokstäver" får en .blue[identitet oavsett byte-representation]
 
 - Denna identitet identifieras av ett numeriskt värde, som A:=0x0041, B:=0x0042, ...
 
-- En mer abstrakt nivå än teckenkodning
+- En .blue[mer abstrakt nivå än teckenkodning], oberoende av byte-representation
 
 ???
 - Påpeka vikten av att dela upp förståelsen av teckenkodning som en sak
@@ -136,7 +127,7 @@ In a properly engineered design, 16 bits per character are more than sufficient 
 
 - .blue[U+0041] används som syntax istället för .red[0x0041]
 
-- Unicode definierar både egenskaper för kodpunkter, och teckenenkodningar för att representera dessa
+- Unicode definierar både egenskaper för kodpunkter, och teckenenkodningar för att representera dessa som bytes
 
 ???
 - Vi vill slippa säga "bokstäver" i citat
@@ -146,31 +137,25 @@ In a properly engineered design, 16 bits per character are more than sufficient 
 ---
 # UTF-16
 
-- **Två bytes** per kodpunkt: A=0x0041, B=0x0042, ..., Ö=0x00D6, ..., ∞=0x221E
-  - Värdet för A=0x41 är kompatibelt med ASCII, men inte byte-representationen (två bytes)
+- .red[Två bytes] per kodpunkt: A=.blue[0x0041], B=0x0042, ..., Ö=0x00D6, ..., ∞=0x221E
+  - Kodpunkten för A=.blue[U+0041] är kompatibelt med ASCII, men inte byte-representationen (en byte .blue[0x41] i ASCII)
   
 - Värdena kräver två bytes - vilken ordning? *Big-Endian* vs *Little-Endian*
 
 
 ---
-# Endian problemet: Big-Endian
-- Big-Endian (eller *network byte order*): Den högsta byte kommer först.
+# Big-endian
+- Big-endian (eller .green[network byte order]): Mest signifikant byte först
 
-  - Som decimalsystem (12 = 10 + 2)
+  - .red[Som decimalsystem (12 = {1,2})]
   
-  - På stora (*Big*) addresser kommer slutet (*End*) på talet
-  
-  - ∞=0x221E blir representerat som byte-sekvensen `{0x22, 0x1E}`
+  - .blue[∞=0x221E] blir representerat som byte-sekvensen .blue[{0x22, 0x1E}]
 
 ---
-# Endian problemet: Little-Endian
-- Little-Endian: Omvänt - på små (*Small*) addresser kommer slutet (*End*) på talet
+# Little-endian
+- Little-endian: Minst signifikant byte först
 
-  - På små (*Little*) addresser kommer slutet (*End*) på talet.
-  
-  - Används av intelprocessorer
-  
-  - ∞=0x221E blir representerat som byte-sekvensen `{0x1E, 0x22}`
+  - .blue[∞=0x221E] blir representerat som byte-sekvensen .blue[{0x1E, 0x22}]
 
 ---
 # UTF-16BE och UTF16LE
@@ -352,31 +337,41 @@ void defaultUtf16() throws IOException {
 
 - Räcker inte för alla möjliga emojis och varianter på dessa
 
-- UTF-16 tillåter fler genom att kombinera speciella 16-bitars värden
+- UTF-16 tillåter .red[fler genom att kombinera speciella 16-bitars värden]
 
 
 ---
 # Surrogatkodpunkter
-- Om första värdet är en .blue[high surrogate], i intervallet U+D800 till U+DBFF (vilket ger 1,024 möjliga värden)...
-  
-- så kombineras den med en följande .red[low surrogate], i intervallet U+DC00 till U+DFFF (återigen 1,024 möjliga värden)
+- Vissa kodpunkter som ännu inte allokerats definieras att de ska kombineras för att utöka namnrymnden:
+  - Om första värdet är en .blue[high surrogate]
+  - så kombineras den med en följande .red[low surrogate]
+
   
 ---
-# Hur ser det ut på bit-nivå?
+# Surrogatkodpunkter: Hur kombinera?
+
+.blue[Låg surrogat] = 110110.blue[yyyyyyyyyy]
+
+.red[Hög surrogat] = 110111.red[xxxxxxxxxx]
 
 Kodpunkt = .blue[yyyyyyyyyy].red[xxxxxxxxxx]
 
-Låg surrogat = 110110.blue[yyyyyyyyyy]
-
-Hög surrogat = 110111.red[xxxxxxxxxx]
+- Innebär att låga surrogat är i intervallet .blue[{U+D800, U+DBFF}]
+höga i intervallet .red[{U+DC00, U+DFFF}]
+  - Varje intervall har 2^10=1024 värden
+  
+???
+- Låga surrogat-kodpunkter definieras av bit-prefixet 110110 (visa genom att peka)
+- Och höga med ett annat (peka)
+- Kombineras till
 
 
 ---
 # Unicodes namnrymd
 - Totalt möjliga värden:
-  - 2^16 - 2\*1024 + 1024\*1024 = 1,112,064
+  - 2^16 + 1024\*1024 = 1,114,112
 
-- Unicode kommer inte definiera utanför den mängden
+- Unicode kommer inte definiera kodpunkter utanför den mängden
   
 - 836,536 lediga tecken (**Reserverade**, dvs tillgängliga för användning men ännu inte definierade) i senaste Unicode 12.1
 
@@ -385,12 +380,19 @@ Hög surrogat = 110111.red[xxxxxxxxxx]
 
 ---
 # Java och UTF-16
-- I java är en **char** 16 bitar, så är baserat på UTF-16
+- En **char** är 16 bitar - en .red[kodenhet] i UTF-16
 
 - `String.length()` returnerar antal UTF-16 värden, inte antal kodpunkter
 
 - Kodpunkter som kräver två 16 bitars är ofta ovanliga
   - Många system hanterar inte detta korrekt
+  
+???
+- En **kodenhet** är alltså enheten (atomen) i encodingen
+- En **kodpunkt** är något mer abstrakt.
+  - För vanliga tecken är det ett till ett mellan kodenhet och kodpunkt
+  - Meeen: För surrogat-kodpunkter
+- Pausa och understryk
   
 ---
 # Unicode literals i java
@@ -417,6 +419,10 @@ void literals() {
 - `byte[] String.getBytes(Charset charset)`
   
 - Vid större datamängder bör strömmar användas för att kontinuerligt tolka/koda allteftersom data blir tillgänligt
+
+???
+- Poängtera: Har du en byte-array har du inte en sträng. En sträng är kombinationen av byte-array och en encoding
+- Omvänt: Har du en sträng har du inte en byte-array. En byte-array är en kombination av sträng och en encoding
 
 ---
 # Hantering av surrogatkodpunkter i java
@@ -504,13 +510,13 @@ public static void main(String[] args) {
 - Endian-problemet återkommer, så UTF-32BE och UTF-32LE precis som med 16-bitars teckenkodning
 
 ???
-- Obs att antal kodpunkter fortfarande är begränsat till de som kan uttryckas i Unicode, så  1,112,064 totalt
+- Obs att antal kodpunkter fortfarande är begränsat till de som kan uttryckas i Unicode, så 1,114,112 totalt (32 bitar utnyttjas inte fullt ut)
 - UCS-4 är samma sak som UTF-32
 
 ---
 # UTF-24?
 
-- För 1,112,064, max antal kodpunkter, ryms i 21 bitar
+- Max antal kodpunkter (1,114,112), ryms i .red[21 bitar]
 
 - Fanns förslag om UTF-24 men accepterades aldrig
 
@@ -520,18 +526,19 @@ public static void main(String[] args) {
 ---
 # UTF-8
 
-- UTF-16 är 16-bitars värden som vid behov kan kombineras .blue[**med ett annat värde**] för att ge en kodpunkt med högt värde
+- UTF-16 är 16-bitars enheter där .blue[**två enheter vid behov kan kombineras**] till kodpunkter
 
-- UTF-8 är 8-bitars värden som vid behov kan kombineras .red[**med upp till tre andra värden**] för att ge en kodpunkt med högt värde
+- UTF-8 är 8-bitars enheter där .red[**upp till fyra enheter vid behov kan kombineras**] till kodpunkter
+  - Vanligaste teckenkodningen på internet, "den du ska använda"
 
 
 ---
-# Varför UTF-8
+# Varför UTF-8 istället för UTF-16?
 
-- Bakåtkompatibilitet med ASCII, i det att ASCII är ett subset av UTF-8
+- .red[Bakåtkompatibilitet med ASCII], i det att ASCII är ett subset av UTF-8
   - Alla ASCII-filer är giltiga UTF-8 filer
 
-- Utrymme i minne och lagring - om största delen av texten är ASCII (vilket i många sammanhang är fallet), dubblerar UTF-16 minnesanvändning (= ger sämre prestanda)
+- .blue[Mindre utrymme i minne och lagring] - om största delen av texten är ASCII (vilket ofta är fallet), dubblerar UTF-16 minnesanvändning (= ger sämre prestanda)
 
 
 ---
@@ -545,28 +552,28 @@ public static void main(String[] args) {
 - 11110.blue[xxx] + 10.blue[xxxxxx] + 10.blue[xxxxxx] + 10.blue[xxxxxx]
 
 ---
-# Continuation bytes
+# Inledande och continuation bytes
 - .blue[110]xxxxx + .red[10]xxxxxx
 
 - .blue[1110]xxxx + .red[10]xxxxxx + .red[10]xxxxxx
 
 - .blue[11110]xxx + .red[10]xxxxxx + .red[10]xxxxxx + .red[10]xxxxxx
 
-- En inledande byte (.blue[110]xxxxx/.blue[1110]xxxx/.blue[11110]xxx) som följs av *continuation bytes* (.red[10]xxxxxx)
+- En .blue[inledande byte] (.blue[110]xxxxx/.blue[1110]xxxx/.blue[11110]xxx) som följs av .red[continuation bytes] (.red[10]xxxxxx)
 
 ---
 # Maxvärde upp till 21 bitar
 
-- .blue[11110]xxx + .red[10]xxxxxx + .red[10]xxxxxx + .red[10]xxxxxx
+- .blue[11110].green[xxx] + .red[10].green[xxxxxx] + .red[10].green[xxxxxx] + .red[10].green[xxxxxx]
 
-- Är 21 bitar, vilket är tillräckligt för att täcka Unicodes namnrymd på 1,112,064 värden
+- Är .green[21 bitar], vilket är tillräckligt för att täcka Unicodes namnrymd på 1,114,112 värden
 
 
 ---
 # UTF-8 är självsynkroniserande
 - Hoppas det in mitt i en UTF-8 ström kommer inte en felaktigt värde avläsas
 
-- Istället kan continuation bytes (.red[10]xxxxxx) skippas (max 3 st) innan strömmen kan börja avläsas igen
+- Istället kan eventuella .red[continuation bytes] (.red[10]xxxxxx) skippas (max 3 st) innan strömmen kan börja avläsas igen
 
 ---
 # UTF-8: Overlong encodings
@@ -585,11 +592,11 @@ public static void main(String[] args) {
 
 ---
 # UTF-8: För stora värden
-- 11110xxx + 10xxxxxx + 10xxxxxx + 10xxxxxx
+- 11110.green[xxx] + 10.green[xxxxxx] + 10.green[xxxxxx] + 10.green[xxxxxx]
 
-- 21 bits räcker för Unicodes namnrymd på 1,112,064 - men kan också uttrycka större värden (2,097,151)
+- .green[21 bits] räcker för Unicodes namnrymd på 1,114,112 - men kan också uttrycka större värden (.red[2,097,151])
 
-- Om värdet är för stort är det ogiltigt UTF-8
+- Om värdet är för stort är det .red[ogiltig UTF-8]
 
 
 ---
@@ -603,17 +610,23 @@ public static void main(String[] args) {
 
 ---
 # Felhantering
-- UTF-8 decoder: Transformerar en ström av bytes till en ström av (teckenenkodade) kodpunkter
+- **UTF-8 decoder**: Transformerar en .blue[ström av bytes] till en .blue[ström av kodpunkter]
+  - .blue[{0x23, 0x42, 0xA1, ... }]
+  - ->
+  - .red[{U+0041, U+AF0F, U+0110, .... }]
 
-- Tidiga UTF-8 decoders hade ofta problem, ingen eller inkonsekvent felhantering
+- Tidiga UTF-8 decoders hade ofta inkonsekvent felhantering - olika program tolkade ogiltiga UTF-8 sekvenser olika
 
 ---
 # Fel är oacceptabelt
 - Unicode definierar att en decoder måste hantera ogiltiga byte-sekvenser som fel
 
-  - Får inte acceptera ogiltigt input
-  - Får inte ge ifrån sig ogiltiga kodpunkter (surrogat, för höga värden)
-  - "Hantera som fel" kan betyda olika saker
+  - Får .red[inte] acceptera ogiltigt input och .red[gissa] vad som avses
+  - Får .red[inte] ge ifrån sig .red[ogiltiga kodpunkter] (surrogat, för höga värden)
+  - .blue[Hantera som fel] kan betyda olika saker
+  
+???
+- Jämför med HTML5-specifikationen, som också vill att fel ska hanteras lika
 
 ---
 # Felhantering: Kasta exception eller avbryt inläsning
@@ -643,15 +656,22 @@ void iso88591ReadAsUtf8() {
 
 ---
 # Unicode som databas
-- Unicode kan ses som en **versionerad databas** som definierar egenskaper för kodpunkter
+- Unicode kan ses som en .red[versionerad databas] som definierar egenskaper för kodpunkter
 
-- .blue[Namn] är en egenskap:
-  - U+0041 (A) har namnet ".blue[LATIN CAPITAL LETTER A]"
-  - U+1F4A9 (💩) har namnet ".blue[PILE OF POO]"
+- .red[Bakåtkompatibel] - kodpunkter kan läggas till och deprekeras, men inte tas bort eller ändras
+
+---
+# Namn på kodpunkter
+- .blue[Namn] är en egenskap i Unicode-databasen (ett fält på en kodpunkt):
+  - .red[U+0041] (A) har namnet ".blue[LATIN CAPITAL LETTER A]"
+  - .red[U+1F4A9] (💩) har namnet ".blue[PILE OF POO]"
+  
+???
+- "Den här lilla bajsplutten" kanske är bra namn
   
 ---
 # Namn av code point i java
-- Javas standardbibliotek innehåller delar av Unicodes databas
+- .red[Javas standardbibliotek innehåller delar av Unicodes databas], bland annat namn
 
 - `Character.getName(int codePoint)` kan t.ex. användas för att erhålla namnet för en kodpunkt:
 
@@ -689,11 +709,14 @@ JDK 1.1        February 19, 1997    Unicode 2.0
 JDK 1.0        January 23, 1996     Unicode 1.1.5
 ```
 
+???
+- Testet på förra sliden, där vi tog ut namnet på en bajsplutt, fungerar inte på hur gamla java-versioner som helst
+
 ---
 # General category
-Varje kodpunkt har en [General Category](https://en.wikipedia.org/wiki/Unicode_character_property#General_Category) som berättar vad det är för typ av tecken
+Varje kodpunkt har i Unicode-databasen ett [General Category](https://en.wikipedia.org/wiki/Unicode_character_property#General_Category)-fält.
 
-Kan erhållas med hjälp av `Character.getType(int codePoint)`:
+Berätter vilken typ av bokstav det är.
 
 ```java
 @Test
@@ -708,7 +731,8 @@ void generalCategory() {
 ```
 
 ???
-- Följ länken och gå igenom på wikipedia vad det finns för några, för en känsla
+- Följ General Category-länken till
+- I java kan vi erhålla detta via metoden Character.getType())
 
 ---
 # Private use characters
@@ -742,6 +766,7 @@ void generalCategory() {
   - https://en.wikipedia.org/wiki/UTF-16#/media/File:Unifont_Full_Map.png
   
 ???
+- Följ länken och gå igenom med start av ASCII högst upp
 - Varje rad är 256 tecken lång
 - Observera 8 (pga 1024+1024 = 8*256) gråa rader för surrogate characters
 - Efter detta många vita rader för private use characters
@@ -820,7 +845,7 @@ Förutom att skrivas med modifying character, så kan **Å** skrivas med en anna
 
 - Kodpunkten `U+212B (ANGSTROM SIGN)`
 
-Dessa är att anse som ekvivalenta.
+Dessa är att anse som .blue[ekvivalenta].
 
 ---
 # Unicode canonical equivalence
@@ -876,11 +901,11 @@ normaliseras till samma form som
 Characters are decomposed and then recomposed by canonical equivalence.
 
 ---
-# Varianter med kompatibel ekvivalens
-- NF.green[K].red[D] (Normalization Form .green[Compatibility] .red[Decomposition])
-- NF.green[K].blue[C] (Normalization Form .green[Compatibility] .blue[Composition])
-- NF.red[D] (Normalization Form Canonical .red[Decomposition])
-- NF.blue[C] (Normalization Form Canonical .blue[Composition])
+# De fyra normalformerna
+- NF**.green[K].red[D]** (Normalization Form **.green[Compatibility] .red[Decomposition]**)
+- NF**.green[K].blue[C]** (Normalization Form **.green[Compatibility] .blue[Composition]**)
+- NF**.red[D]** (Normalization Form Canonical **.red[Decomposition]**)
+- NF**.blue[C]** (Normalization Form Canonical **.blue[Composition]**)
 
 ---
 # Hur kan Unicode normalisering användas
@@ -928,11 +953,6 @@ void normalization() {
 ```
 
 ---
-# Creative usernames and Spotify account hijacking
-
-https://labs.spotify.com/2013/06/18/creative-usernames/
-
----
 # Bokstäver kan vara olika breda
 - `U+FDFD (ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM)` är en kodpunkt som ser ut så här:
 ﷽
@@ -972,65 +992,9 @@ void upperCase() {
 ```
 
 ---
-# Grapheme cluster
-- Ett **grapheme cluster** är ungefär en **användarupplevd bokstav**
-  - En eller flera kodpunkter
-  - T.ex. 👩‍👩‍👧‍👦 (sju kodpunkter) är ett grapheme cluster
-  - En text selection i ett GUI kommer normalt aldrig sluta mitt i ett grafem kluster
-  - Önskningen ".red[ta bort sista bokstaven]" motsvarar ofta att .blue[ta bort sista grafem klustret]
-
-
----
-# ICU project
-
-- http://site.icu-project.org/home
-
-- "ICU is a mature, widely used set of C/C++ and Java libraries providing Unicode and Globalization support for software"
-
-- Om en Unicode-funktionalitet saknas i javas standardbibliotek finns det antagligen i ICU
-
-- Innehåller bland annat stöd för grapheme clusters
-
----
-# Uniview
-- Uniview (https://r12a.github.io/uniview/) är ett verktyg för att debugga och visualisera Unicode-sekvenser
-
-- Kan länka in med sekvenser av kodpunkter:
-  - 👩‍👩‍👧‍👦 - en familj! Vilken sekvens är det här?
-  - https://r12a.github.io/uniview/?charlist=👩‍👩‍👧‍👦
-
----
-# Twitter, emojis och jämlikhet
-
-- [💁](https://r12a.github.io/uniview/?charlist=💁) Emoji: 2
-
-- [💁🏽](https://r12a.github.io/uniview/?charlist=💁🏽) Emoji + skin tone: 4
-
-- [💁‍♂️](https://r12a.github.io/uniview/?charlist) Emoji + gender: 7
-
-- [💁🏽‍♂️](https://r12a.github.io/uniview/?charlist=💁🏽‍♂️) Emoji + gender + skin tone: 9
-
-- [🇳🇴](https://r12a.github.io/uniview/?charlist=🇳🇴) Country Flag: 4
-
-- [🏳️‍🌈](https://r12a.github.io/uniview/?charlist=🏳️‍🌈 ) Rainbow Flag: 7
-
-
-???
-- Förut räknade twitter varje kodpunkt
-- Från och med oktober 2018 räknas varje emoji som två bokstäver
-
----
-# Sortering
+# Sortering är språk-beroende
 
 ```java
-@Test
-void swedish() {
-  var collator = Collator.getInstance(Locale.forLanguageTag("sv"));
-  var list = Arrays.asList("a", "b", "c");
-  list.sort(collator);
-  Assertions.assertEquals(List.of("a", "b", "c"), list);
-}
-
 @Test
 void lithuanian() {
   var collator = Collator.getInstance(Locale.forLanguageTag("lt"));
@@ -1050,9 +1014,65 @@ void german() {
 
 ???
 - Sortering (i den betydelsen hur användare normalt förväntar sig sorterade, listor av strängar att visas), är språkberoende
+- Unicode definierar hur strängar kan sorteras i olika språk
 - Finns stöd för detta i javas standardbibliotek: java.text.Collator (highlight:a i koden)
 - För t.ex. lituaiska sorteras y mellan i och k
 - För t.ex. tyska sorteras ä strax efter a
+
+
+---
+# Grapheme cluster
+- Ett **grapheme cluster** är ungefär en **användarupplevd bokstav**
+  - En eller flera kodpunkter
+  - T.ex. [👩‍👩‍👧‍👦 (sju kodpunkter)](https://r12a.github.io/uniview/?charlist=👩‍👩‍👧‍👦) är ett grapheme cluster
+  - En text selection i ett GUI kommer normalt aldrig sluta mitt i ett grafem kluster
+  - Önskningen ".red[ta bort sista bokstaven]" motsvarar ofta att .blue[ta bort sista grafem klustret]
+
+???
+- Klicka på länken - poängtera **Uniview** som trevligt web-baserat gränssnitt
+
+
+---
+# ICU project
+
+- http://site.icu-project.org/home
+
+- "ICU is a mature, widely used set of C/C++ and Java libraries providing Unicode and Globalization support for software"
+
+- Om en Unicode-funktionalitet saknas i javas standardbibliotek finns det antagligen i ICU
+
+- Innehåller bland annat stöd för grapheme clusters
+
+
+---
+# Creative usernames and Spotify account hijacking
+
+https://labs.spotify.com/2013/06/18/creative-usernames/
+
+???
+- Dragspel - skippa om ont om tid, quiz kommer ta några minuter
+
+
+---
+# Twitter, emojis och jämlikhet
+
+- [💁](https://r12a.github.io/uniview/?charlist=💁) Emoji: 2
+
+- [💁🏽](https://r12a.github.io/uniview/?charlist=💁🏽) Emoji + skin tone: 4
+
+- [💁‍♂](https://r12a.github.io/uniview/?charlist=💁‍♂) Emoji + gender: 7
+
+- [💁🏽‍♂](https://r12a.github.io/uniview/?charlist=💁🏽‍♂) Emoji + gender + skin tone: 9
+
+- [🇳🇴](https://r12a.github.io/uniview/?charlist=🇳🇴) Country Flag: 4
+
+- [🏳‍🌈](https://r12a.github.io/uniview/?charlist=🏳‍🌈) Rainbow Flag: 7
+
+
+???
+- Dragspel - skippa om ont om tid, quiz kommer ta några minuter
+- Förut räknade twitter emojis med modifieras som olika längd vad gäller deras max-begränsning i längd
+- Från och med oktober 2018 räknas varje emoji som två bokstäver
 
 ---
 # Quiz time!
