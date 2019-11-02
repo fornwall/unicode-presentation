@@ -3,10 +3,10 @@ class: center, middle
 
 .center[![Logotyp för Unicode konsortium](images/unicode-logo.jpg)]
 
-https://fornwall.net/unicode
+https://fornwall.net/unicode-tapas
 
 ---
-# Frågor som ska besvaras?
+# Vad som ska tas upp
 
 - Vad är UTF-8, UTF-16 och UTF-32?
 - Hur kan historiken förklara nuvarande konstruktioner?
@@ -63,9 +63,6 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 - **Många** varianter som använde åttonde biten skapades
   - Olika mellan olika länder (och vissa länder hade flera)
 
-???
-- Vi ska bara nämna de två viktigaste
-
 ---
 # 8 bitars teckenkodning: ISO-8859-1
 
@@ -75,7 +72,14 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
   
 - Stödjer ".green[västeuropeiska]" språk
   - Men inte alla, och inte fullt ut
+  
+- **Windows-1252**: Byter ut 30-tal kontrolltecken mot synliga bokstäver
 
+???
+- Windows-1252 alltså som iso-8859-1 men använder fler synliga bokstäver
+  - Ofta mer praktiskt
+  - vanligt att dokument som egentligen är windows-1252 **felaktigt påstår iso-8859-1**, att HTML5-specifikationen säger att dokument som påstår sig vara **iso-8859-1 ska avkodes som de vore windows-1252**
+  
 ---
 # 8 bitar räcker inte heller långt
 
@@ -122,10 +126,10 @@ In a properly engineered design, .blue[16 bits per character are more than suffi
   
 ---
 # Kodpunkter
-- Vi kallar denna identet för **kodpunkt** (en: **code point**)
+- I Unicode kallas denna identitet för **kodpunkt** (en: **code point**)
   - Mer generellt än bokstav
 
-- .blue[U+0041] används som syntax istället för .red[0x0041]
+- **.blue[U+0041]** används som syntax istället för **.red[0x0041]**
 
 - Unicode definierar både egenskaper för kodpunkter, och teckenenkodningar för att representera dessa som bytes
 
@@ -657,9 +661,9 @@ void iso88591ReadAsUtf8() {
 ---
 # Unicode som databas
 - Unicode kan ses som en .red[versionerad databas] som definierar egenskaper för kodpunkter
-
-- .red[Bakåtkompatibel] - kodpunkter kan läggas till och deprekeras, men inte tas bort eller ändras
-
+  - En rad med kodpunktens värde (**U+xxxx**) som primary key och ett .red[flertal fält]
+  - Och .blue[beteenden samt algoritmer] på hur denna data ska behandlas
+  
 ---
 # Namn på kodpunkter
 - .blue[Namn] är en egenskap i Unicode-databasen (ett fält på en kodpunkt):
@@ -685,6 +689,15 @@ void codePointName() {
     assertEquals("PILE OF POO", Character.getName(codePoint));
 }
 ```
+
+---
+# Unicode och bakåtkompatibiltet
+
+- Finns olika **Unicode Stability Policies** på vad som kan och inte kan ändras
+- .blue[Bakåtkompatibel] - kodpunkter kan läggas till och deprekeras, men inte tas bort, och många fält kommer aldrig ändras
+
+- Namn ändras inte: `U+FE18` kommer alltid heta PRESENTATION FORM FOR VERTICAL RIGHT WHITE LENTICULAR .red[BRAKCET]
+
 
 ---
 # Java versioner och Unicode versioner
@@ -739,6 +752,10 @@ void generalCategory() {
 - Det finns totalt 137,468 kodpunkter som har kategorin **private use**
 
 - "Private-use characters are code points whose interpretation is not specified by a character encoding standard and whose use and interpretation may be determined by private agreement among cooperating users"
+
+???
+- Om du vill definiera kodpunkter från alviska kan du ta en range härifrån och säga att detta bör användas bland Tolkien-entusiaster
+  - Just detta är t.ex. redan gjort (och klingong)
 
 ---
 # Private use exempel: Apple logotyp
@@ -959,13 +976,18 @@ void normalization() {
 
 - Och tecken som har ingen bredd, tecken som kombinerar med föregående för att ändra bredd osv
 
-- `String.length()` som mått på hur mycket utrymme sträng tar visuellt fungerar inte
+- `String.length()` inte alltid bra approximation på visuell bredd av sträng
+
+???
+- Kom ihåg: `String.length()` returnerar antal UTF-16 kodenheter
+
 
 ---
 # Gemener och versaler: Skillnader i antal kodpunkter
 - Javas `String.toUpperCase()` och `String.toLowerCase()` hanterar komplexiteten i gemener&versaler
 
 - Längden på strängen kan ändras av detta, exempelvis blir .red[ß U+00DF LATIN SMALL LETTER SHARP S] till en sekvens av två .blue[S U+0053 LATIN CAPITAL LETTER S]
+
 
 ---
 # Gemener och versaler: Skillnad mellan språk
@@ -974,6 +996,8 @@ void normalization() {
 
 - Exempel: För turkiska blir .red[i U+0069 (LATIN SMALL LETTER I)] som versal .blue[İ U+0130 LATIN CAPITAL LETTER I WITH DOT ABOVE]
 
+???
+- Samma då med `String.toLowerCase()`
 
 ---
 # Gemener och versaler: Exempel i java
@@ -1075,6 +1099,12 @@ https://labs.spotify.com/2013/06/18/creative-usernames/
 - Från och med oktober 2018 räknas varje emoji som två bokstäver
 
 ---
-# Quiz time!
+# Quiz-dags!
 
-![Quiz time](images/quiz.webp)
+- Gå till **kahoot.it** på era telefoner
+
+![Kahoot screenshot](images/kahoot.png)
+
+???
+- Fråga om alla som vill är redo och stå på sidan
+- Gå till kahoot.com och starta, kom ihåg **namngenerering** och **individuell**
