@@ -167,9 +167,9 @@ In a properly engineered design, .blue[16 bits per character are more than suffi
 - Någon som sätt en "feff" (F E FF) i början av t.ex. en xml-fil i en texteditor?
 
 ---
-# Byte order mark
+# Byte order mark (BOM)
 
-- Kodpunkten U+.blue[FE].red[FF] är en byte order mark
+- Kodpunkten U+.blue[FE].red[FF] är en byte order mark (BOM)
 
   - Placera den i början på fil. Vid inläsning, om de två första byte är {0x.blue[FE], 0x.red[FF]} är det BE, annars {0x.red[FF], 0x.blue[FE]} och därigenom LE
 
