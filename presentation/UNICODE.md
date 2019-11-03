@@ -6,12 +6,10 @@ class: center, middle
 https://fornwall.net/unicode-tapas
 
 ---
-# Vad som ska tas upp
+# Vad som ska besvaras
 
-- Vad är UTF-8, UTF-16 och UTF-32?
+- Vad är Unicode och varför är det relevant?
 - Hur kan historiken förklara nuvarande konstruktioner?
-- Vad är några vanliga encoding problem?
-- Vad är Unicode normalization och varför bör det användas?
 - Vad finns det för vanliga antaganden som inte fungerar över alla språk?
 
 ---
