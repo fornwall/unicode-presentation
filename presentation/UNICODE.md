@@ -88,7 +88,7 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 
 - .blue[Unicode], en idé om detta, arbetades fram i slutet på 80-talet
 
-- Joe Becker från Xerox skapade ett första dokument för Unicode
+- Joe Becker från Xerox skapade en första draft för Unicode
 
 
 ---
