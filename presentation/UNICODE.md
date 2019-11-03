@@ -202,8 +202,8 @@ In a properly engineered design, .blue[16 bits per character are more than suffi
 - En character encoding representeras av klassen [java.nio.charset.Charset](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/charset/Charset.html)
 
 - För vanliga charsets finns Charset-instanser som fält i [StandardCharsets](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/charset/StandardCharsets.html)
+  - StandardCharsets.US_ASCII
   - StandardCharsets.ISO_8859_1
-  - StandardCharsets.UTF_8
   - StandardCharsets.UTF_16
   - StandardCharsets.UTF_16BE
   - StandardCharsets.UTF_16LE
