@@ -49,6 +49,7 @@ Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, WHITESPACE, DE
 ---
 # 7 bitar räcker inte långt
 
+- Vart är till exempel Å, Ä och Ö?
 - När åttonde biten blev tillgänglig fick det plats för mer
 - **Många** varianter som använde åttonde biten skapades
   - Olika mellan olika länder (och vissa länder hade flera)
