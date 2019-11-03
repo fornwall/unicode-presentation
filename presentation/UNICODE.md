@@ -351,8 +351,7 @@ void defaultUtf16() throws IOException {
 
 Kodpunkt = .blue[yyyyyyyyyy].red[xxxxxxxxxx]
 
-- Innebär att låga surrogat är i intervallet .blue[{U+D800, U+DBFF}]
-höga i intervallet .red[{U+DC00, U+DFFF}]
+- Innebär att låga surrogat är i intervallet .blue[{U+D800, U+DBFF}], höga i intervallet .red[{U+DC00, U+DFFF}]
   - Varje intervall har 2^10=1024 värden
   
 ???
