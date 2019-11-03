@@ -13,14 +13,6 @@ https://fornwall.net/unicode-tapas
 - Vad finns det för vanliga antaganden som inte fungerar över alla språk?
 
 ---
-# Det började med tecken...
-
-![Various writing systems](images/alphabets-old.png)
-
-???
-Skriftspråk, symboler för att representera skriftliga uttryck, har funnits länge.
-
----
 # ASCII: Sju bitar
 
 - ASCII, American Standard Code for Information Interchange, arbetades fram under 60-talet
