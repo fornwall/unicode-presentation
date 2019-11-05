@@ -22,6 +22,13 @@ https://fornwall.net/unicode-tapas
 
    - 2^27 = 128 möjliga värden: 0-127
 
+???
+- Sju bitars encoding för att åttonde kan vara en paritetsbit.
+  - Summera bit:arna och kontrollera att de är jämn (eller udda).
+- Terminaler satte åttonde biten för att indikera att Alt-tangenten var nedtryckt
+- Vissa skrivare satte åttonde biten för att indikera kursiv stil
+
+
 
 ---
 # ASCII-tecken
@@ -34,10 +41,6 @@ Följande tecken kan uttryckas:
 - [\\]^\_&#96;{|}~
 
 Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, BELL, BACKSPACE, DEL.
-
-???
-- Sju bitars encoding för att åttonde kan vara en paritetsbit.
-- Summera bit:arna och kontrollera att de är jämn (eller udda).
 
 
 ---
@@ -144,7 +147,7 @@ In a properly engineered design, .blue[16 bits per character are more than suffi
 
   - .red[Som decimalsystem (12 = {1,2})]
   
-  - .blue[∞=0x221E] blir representerat som byte-sekvensen .blue[{0x22, 0x1E}]
+  - .blue[∞=U+221E] blir representerat som byte-sekvensen .blue[{0x22, 0x1E}]
 
 ---
 # Little-endian
