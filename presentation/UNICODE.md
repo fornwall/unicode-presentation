@@ -33,7 +33,7 @@ Följande tecken kan uttryckas:
 - !"#$%&'()\*+,-./:;<=>?@
 - [\\]^\_&#96;{|}~
 
-Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, TAB, LINEBREAK, DEL.
+Och flera "konstiga" tecken som inte är synliga, t.ex. ESC, BELL, BACKSPACE, DEL.
 
 ???
 - Sju bitars encoding för att åttonde kan vara en paritetsbit.
