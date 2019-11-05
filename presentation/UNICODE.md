@@ -834,6 +834,7 @@ void generalCategory() {
 ???
 - Paus innan vi börjar här?
 - En annan typ av kategori på kodpunkter är **Combining character**
+- Observera att modifierande kodpunkter kommer **efter** den kodpunkt som modifieras
 
 ---
 # Combining characters: Emoji modifier
@@ -841,6 +842,9 @@ Ett annat exempel på modifiers är de som anger hudfärg på emojis, som `U+1F3
 
 
 .center[![emoji och skin tone](skin-modifier.png)]
+
+???
+- En ospecifierad emoji representeras av konvention med gul hudfärg
 
 ---
 # Combining characters: Multiple
@@ -853,6 +857,13 @@ Flera modifiers kan förekomma, nedan med `U+0065 (LATIN SMALL LETTER E)` och `U
 
 ## ē̄̄ // U+0065, U+0304, U+0304, U+0304
 
+???
+- Ingen begränsning angivet för hur många modifierande det får vara
+- I praktiken kommer många applikationer ha någon begränsning?
+- Någon som känner igen "Zalgo text?
+  - Det är med hjälp av kombinerande bokstäver
+  - https://lingojam.com/ZalgoText
+
 ---
 # Olika typer av kombinerande kodpunkter
 
@@ -863,7 +874,7 @@ Med hjälp av `Character.getType(codePoint)` kan vi se erhålla Unicode kategori
 
 - Character.**NON_SPACING_MARK**: Märken såsom cirkel&prickar i ÅÄÖ som går ovanför eller under utan att påverka vidden.
 
-- Character.**ENCLOSING_MARK**: Ett omgivande märke som en cirkel.
+- Character.**ENCLOSING_MARK**: Ett omgivande märke som en cirkel: Ⓐ
 
 - Character.**COMBINING_SPACING_MARK**: En markering som påverkar vidden på det den kombineras med.
 
@@ -927,17 +938,21 @@ Characters are **decomposed** by canonical equivalence, and multiple combining c
 # NFD: Specifik ordning viktig
 Här är specifik ordning viktig, så att
 
-- "a modifierad med prick ovanför modifierad med prick nedanför"
+- "a modifierad med .red[prick ovanför] modifierad med .blue[prick nedanför]"
 
-normaliseras till samma form som
+**normaliseras till samma form** (dvs, **är ekivalent med**) som
 
-- "a modifierad med prick nedanför modifierad med prick ovanför"
+- "a modifierad med .blue[prick nedanför] modifierad med .red[prick ovanför]"
+
+???
+- Dvs, ordningen av combiners ska inte spela någon roll
 
 ---
 # Normal form: NFC
 **NFC**: Normalization Form Canonical Composition
 
-Characters are decomposed and then recomposed by canonical equivalence.
+- "Trycker samman kodpunkter så långt det är möjligt":
+  - A +         	̊ -> Å
 
 ---
 # De fyra normalformerna
@@ -991,6 +1006,10 @@ void normalization() {
 }
 ```
 
+???
+- Alla former av Å normaliseras till samma form eftersom de är ekvivalenta
+- Paus? Beror på tid, bör ha ca 15-20 min kvar
+
 ---
 # Bokstäver kan vara olika breda
 - `U+FDFD (ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM)` är en kodpunkt som ser ut så här:
@@ -1001,6 +1020,7 @@ void normalization() {
 - `String.length()` inte alltid bra approximation på visuell bredd av sträng
 
 ???
+- Vi går över till antaganden som inte är sanna i alla fall.
 - Kom ihåg: `String.length()` returnerar antal UTF-16 kodenheter
 
 
@@ -1010,6 +1030,8 @@ void normalization() {
 
 - Längden på strängen kan ändras av detta, exempelvis blir .red[ß U+00DF LATIN SMALL LETTER SHARP S] till en sekvens av två .blue[S U+0053 LATIN CAPITAL LETTER S]
 
+???
+- Annan sak som kan vara överraskande:
 
 ---
 # Gemener och versaler: Skillnad mellan språk
@@ -1089,15 +1111,9 @@ void german() {
 
 - Innehåller bland annat stöd för grapheme clusters
 
-
----
-# Creative usernames and Spotify account hijacking
-
-https://labs.spotify.com/2013/06/18/creative-usernames/
-
 ???
-- Dragspel - skippa om ont om tid, quiz kommer ta några minuter
-
+- "Finns det inte i javas standardbibliotek, finns det ofta i ICU"
+- Finns i C++ och Java, och bindningar till olika språk (används t.ex. av node.js)
 
 ---
 # Twitter, emojis och jämlikhet
@@ -1119,6 +1135,19 @@ https://labs.spotify.com/2013/06/18/creative-usernames/
 - Dragspel - skippa om ont om tid, quiz kommer ta några minuter
 - Förut räknade twitter emojis med modifieras som olika längd vad gäller deras max-begränsning i längd
 - Från och med oktober 2018 räknas varje emoji som två bokstäver
+  - Twitter gjorde en "jämlikhetsgrej"
+  - Oavsett kön på emoji, oavsett hudfärg, ska det ses som samma längd
+
+
+---
+# Creative usernames and Spotify account hijacking
+
+https://labs.spotify.com/2013/06/18/creative-usernames/
+
+???
+- Dragspel - skippa om ont om tid, quiz kommer ta några minuter
+
+
 
 ---
 # Quiz-dags!
@@ -1130,3 +1159,5 @@ https://labs.spotify.com/2013/06/18/creative-usernames/
 ???
 - Fråga om alla som vill är redo och stå på sidan
 - Gå till kahoot.com och starta, kom ihåg **namngenerering** och **individuell**
+- Ni kommer se alternativen på den här stora skärmen
+  - På era telefoner ska ni klicka på rätt alternativ
