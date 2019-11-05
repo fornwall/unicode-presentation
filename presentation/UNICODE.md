@@ -153,7 +153,7 @@ In a properly engineered design, .blue[16 bits per character are more than suffi
 # Little-endian
 - Little-endian: Minst signifikant byte först
 
-  - .blue[∞=0x221E] blir representerat som byte-sekvensen .blue[{0x1E, 0x22}]
+  - .blue[∞=U+221E] blir representerat som byte-sekvensen .blue[{0x1E, 0x22}]
 
 ---
 # UTF-16BE och UTF16LE
