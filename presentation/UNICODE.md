@@ -196,7 +196,7 @@ In a properly engineered design, .blue[16 bits per character are more than suffi
 
   - Enligt Unicode-standard är UTF-16.blue[BE] "default"
   
-  - Och i java är UTF-16=UTF-16.blue[BE] om ingen BE detekteras
+  - Och i java är UTF-16=UTF-16.blue[BE] om ingen BOM detekteras
   
   - Men UTF-16.red[LE] är vanligare i praktiken och t.ex. WHATWG säger att tolka UTF-16 som UTF-16.red[LE]
   
