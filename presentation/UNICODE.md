@@ -699,6 +699,9 @@ void codePointName() {
 }
 ```
 
+???
+- Inte så vanligt eller praktiskt i applikationskod, mer för felsökning och loggning
+
 ---
 # Unicode och bakåtkompatibiltet
 
@@ -733,6 +736,7 @@ JDK 1.0        January 23, 1996     Unicode 1.1.5
 
 ???
 - Testet på förra sliden, där vi tog ut namnet på en bajsplutt, fungerar inte på hur gamla java-versioner som helst
+  - Kodpunkten i fråga kom i Unicode 6, så förutsätter att java-versionen som kör koden har stöd för Unicode 6
 
 ---
 # General category
@@ -786,7 +790,6 @@ void generalCategory() {
 # Unicode plan
 
 - Kodpunkterna är uppdelade i 17 plan, där varje plan har 65 536 (2^16) kodpunkter
-  - Sista planet kan inte användas fullt ut pga 21-bitars begränsningen
 
 - **Plane 0** heter **Basic Multilingual Plane (BMP)**
   - https://en.wikipedia.org/wiki/UTF-16#/media/File:Unifont_Full_Map.png
@@ -794,7 +797,7 @@ void generalCategory() {
 ???
 - Följ länken och gå igenom med start av ASCII högst upp
 - Varje rad är 256 tecken lång
-- Observera 8 (pga 1024+1024 = 8*256) gråa rader för surrogate characters
+- Observera 8 (pga 1024+1024 = 8\*256) gråa rader för surrogate characters
 - Efter detta många vita rader för private use characters
 
 ---
@@ -805,6 +808,11 @@ void generalCategory() {
 - Plan 14: Supplementary Special-purpose Plane (SSP)
 - Plan 15 och 16: Private use planes
 
+???
+- Alla plan här, utöver plan 0 BMP, kallas supplemental planes (sv: kompletterande plan)
+  - Så kodpunkter i dessa kallas supplemental characters
+  - Alla supplemental characters kräver surrogat-par i UTF-16, eftersom de inte ryms på första planets 16 bitar
+
 ---
 # Noncharacters
 - Det finns 66 kodpunkter som kallas **noncharacters** (icke-bokstäver)
@@ -813,7 +821,8 @@ void generalCategory() {
 - Sista två kodpunkterna i varje plan: .red[U+FFFE], U+FFFF, U+1FFFE, U+1FFFF, U+2FFFE, U+2FFFF, ... U+10FFFE, U+10FFFF
 
 ???
-- Lägg märke till FFFE i rött, vilken är den andra byte-ordningen på BOM (byte order marker) i UTF-16, vilken alltså inte ska dyka upp
+- Känner någon igen FFFE i rött?
+  - Det är den andra, omkringkastade, byte-ordningen på BOM (byte order marker) i UTF-16, vilken alltså inte ska dyka upp eftersom det är en **noncharacter**
 
 
 ---
@@ -821,6 +830,10 @@ void generalCategory() {
 - En combining character modifierar andra bokstäver, som när `U+0306 (COMBINING BREVE)` nedan modifierar `U+0079 (LATIN SMALL LETTER Y)`.
 
 .center[![y och breve](combining.svg)]
+
+???
+- Paus innan vi börjar här?
+- En annan typ av kategori på kodpunkter är **Combining character**
 
 ---
 # Combining characters: Emoji modifier
