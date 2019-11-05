@@ -227,7 +227,7 @@ try {
 ```
 
 ```java
-// För standard charsets (som UTF-8 ovan) är det dock onödigt,
+// För standard charsets (som UTF-16 ovan) är det dock onödigt,
 // (från och med java 7), eftersom dessa charset alltid stöds:
 doSomethingWithCharset(StandardCharsets.UTF_16);
 ```
@@ -326,6 +326,7 @@ void defaultUtf16() throws IOException {
 ???
 - Observera att "A" läses in fel.
 - Java default:ar UTF-16 som UTF-16BE.
+- Någon fråga så här långt på UTF-16?
 
 
 ---
@@ -348,19 +349,20 @@ void defaultUtf16() throws IOException {
 ---
 # Surrogatkodpunkter: Hur kombinera?
 
-.blue[Låg surrogat] = 110110.blue[yyyyyyyyyy]
+.red[Hög surrogat] = 110111.red[yyyyyyyyyy]
 
-.red[Hög surrogat] = 110111.red[xxxxxxxxxx]
+.blue[Låg surrogat] = 110110.blue[xxxxxxxxxx]
 
-Kodpunkt = .blue[yyyyyyyyyy].red[xxxxxxxxxx]
+Kodpunkt = .red[yyyyyyyyyy].blue[xxxxxxxxxx]
 
-- Innebär att låga surrogat är i intervallet .blue[{U+D800, U+DBFF}], höga i intervallet .red[{U+DC00, U+DFFF}]
+- Innebär att höga surrogat är i intervallet .red[{U+DC00, U+DFFF}], låga surrogat i .blue[{U+D800, U+DBFF}]
   - Varje intervall har 2^10=1024 värden
   
 ???
 - Låga surrogat-kodpunkter definieras av bit-prefixet 110110 (visa genom att peka)
 - Och höga med ett annat (peka)
-- Kombineras till
+- Exakta bitar och bytes är inte det viktigaste här
+  - Men bra att förstå grund-idén. Någon fråga här?
 
 
 ---
@@ -381,7 +383,7 @@ Kodpunkt = .blue[yyyyyyyyyy].red[xxxxxxxxxx]
 
 - `String.length()` returnerar antal UTF-16 värden, inte antal kodpunkter
 
-- Kodpunkter som kräver två 16 bitars är ofta ovanliga
+- Kodpunkter som kräver två 16 bitars är ofta ovanliga (men emojis blir vanligare)
   - Många system hanterar inte detta korrekt
   
 ???
@@ -492,6 +494,8 @@ public static void main(String[] args) {
 ---
 # UCS-2
 - UCS-2 är en gammal teckenenkoding som i princip är UTF-16 utan surrogatpar
+  - Används i praktiken inte längre
+  - Men mycket java-kod lever i en UCS-2 värld utan kännedom om surrogatpar
 
 ???
 - Bra att känna till (men används inte)
@@ -528,9 +532,17 @@ public static void main(String[] args) {
 - UTF-8 är 8-bitars enheter där .red[**upp till fyra enheter vid behov kan kombineras**] till kodpunkter
   - Vanligaste teckenkodningen på internet, "den du ska använda"
 
+---
+# UTF-8 dominerar, historiskt
+
+![UTF-8 användning](images/utf8-usage.png)
+
+???
+- Diagrammet slutar 2012, men vi ser hur UTF-8 kom att dominera
+  - Nuvarande användningsgrad är kring 95%
 
 ---
-# Varför UTF-8 istället för UTF-16?
+# Varför UTF-8 istället för UTF-16 (eller 32)?
 
 - .red[Bakåtkompatibilitet med ASCII], i det att ASCII är ett subset av UTF-8
   - Alla ASCII-filer är giltiga UTF-8 filer
@@ -637,7 +649,7 @@ public static void main(String[] args) {
 # Felhantering: Byt ut fel mot ersättningsbokstav
 - Byt ut fel mot ersättningsbokstav
 
-- Ofta ?=U+003F (QUESTION MARK*) eller �=U+FFFD (REPLACEMENT CHARACTER)
+- Ofta ?=U+003F (QUESTION MARK) eller �=U+FFFD (REPLACEMENT CHARACTER)
   
 ```java
 @Test
@@ -649,13 +661,17 @@ void iso88591ReadAsUtf8() {
 ```
 
 ???
-- Vi har gått igenom encodings nu - paus innan vi tar oss an Unicode och egenskaper
+- REPLACEMENT CHARACTER tydligare - ett ASCII frågetecken ingår ofta legitimt i text
+  - Så en REPLACEMENT CHARACTER signalerar tydligare ett teckenkodning-problem
 
 ---
 # Unicode som databas
 - Unicode kan ses som en .red[versionerad databas] som definierar egenskaper för kodpunkter
   - En rad med kodpunktens värde (**U+xxxx**) som primary key och ett .red[flertal fält]
   - Och .blue[beteenden samt algoritmer] på hur denna data ska behandlas
+
+???
+- Vi lämnar nu teckenkodningar bakom oss och går in på egenskaper för kodenheter
   
 ---
 # Namn på kodpunkter
