@@ -20,7 +20,7 @@ https://fornwall.net/unicode-tapas
 - Är en sju bitars encoding:
    - 0.red[xxxxxxx]
 
-   - 2^27 = 128 möjliga värden: 0-127
+   - 2^.red[7] = 128 möjliga värden: 0-127
 
 ???
 - Sju bitars encoding för att åttonde kan vara en paritetsbit.
