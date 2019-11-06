@@ -17,7 +17,7 @@ https://fornwall.net/unicode-tapas
 
 - ASCII, American Standard Code for Information Interchange, arbetades fram under 60-talet
 
-- Är en sju bitars encoding:
+- Är en .red[sju] bitars encoding:
    - 0.red[xxxxxxx]
 
    - 2^.red[7] = 128 möjliga värden: 0-127
